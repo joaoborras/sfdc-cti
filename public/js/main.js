@@ -42,7 +42,7 @@ function connect(username){
 					localStorage.setItem('calledtype', "inbound");
 					localStorage.setItem("softphonestate", 'incomingcall');
 					localStorage.setItem('callLogSubject', 'Call On');
-					$('#number').html('Call From: ' + callerid);
+					$('#number').text('Call From: ' + callerid);
 					break;
 				case 'CallOriginatedEvent':
 					console.log("CallOriginatedEvent received");
