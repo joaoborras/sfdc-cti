@@ -27,58 +27,59 @@ function startHeartbeat(){
 
 function connect(username){
 	var mainXhr = new XMLHttpRequest();
-	console.log('/connect/?username=' + username);
+	console.log('-> /connect/?username=' + username);
 	var url = '/connect/?username=' + username;
 	mainXhr.open('GET', url, true);
 	mainXhr.onreadystatechange = function() {
 		console.log('mainXhr.onreadystatechange called. State is ' + mainXhr.readyState);
-		var eventtype = $(mainXhr.responseText).find('eventtype').text();
-		switch(eventtype){
-			case 'CallReceivedEvent':
-				console.log("CallReceivedEvent received");
-				var callerid = $(mainXhr.responseText).find('callerid').text();
-				localStorage.setItem('callNumber', callerid);
-				localStorage.setItem('calledtype', "inbound");
-				localStorage.setItem("softphonestate", 'incomingcall');
-				localStorage.setItem('callLogSubject', 'Call On');
-				$('#number').html('Call From: ' + callerid);
-				break;
-			case 'CallOriginatedEvent':
-				console.log("CallOriginatedEvent received");
-				var callingid = $(mainXhr.responseText).find('callingid').text();
-				localStorage.setItem('callNumber', callingid);
-				localStorage.setItem('calledtype', "outbound");
-				localStorage.setItem("softphonestate", 'outgoingcall');
-				localStorage.setItem('callLogSubject', 'Call On');
-				$('#number').html('Call To: ' + callingid);
-				break;
-			case 'CallAnsweredEvent':
-				console.log("CallAnsweredEvent received");
-				var callstarttime = new Date().getTime();
-				localStorage.setItem('callStartTime', callstarttime);
-				$('#number').text('Talking');
-				localStorage.setItem("softphonestate", 'busy');
-				//change background color of "call" icon to #ff0000(red)
-				$('#call').css('background-color', '#ff0000');
-				var callerid = $(mainXhr.responseText).find('callerid').text();
-				sforce.interaction.searchAndScreenPop(callerid,'','inbound');
-				break;
-			case 'CallReleasedEvent':
-				console.log("CallReleasedEvent received");
-				var callendtime = new Date().getTime();
-				localStorage.setItem('callEndTime', callendtime);
-				localStorage.setItem("softphonestate", 'free');
-				localStorage.setItem('callDisposition', 'successfull');
-				$('#number').html("");
-				//change background color of "call" icon to #0c3(green)
-				$('#call').css('background-color', '#093');
-				sforce.interaction.getPageInfo(saveCallLog); //save call log in SFDC
-				break;
-			default:
+		if(mainXhr.readyState == 4){
+			var eventtype = $(mainXhr.responseText).find('eventtype').text();
+			switch(eventtype){
+				case 'CallReceivedEvent':
+					console.log("CallReceivedEvent received");
+					var callerid = $(mainXhr.responseText).find('callerid').text();
+					localStorage.setItem('callNumber', callerid);
+					localStorage.setItem('calledtype', "inbound");
+					localStorage.setItem("softphonestate", 'incomingcall');
+					localStorage.setItem('callLogSubject', 'Call On');
+					$('#number').html('Call From: ' + callerid);
+					break;
+				case 'CallOriginatedEvent':
+					console.log("CallOriginatedEvent received");
+					var callingid = $(mainXhr.responseText).find('callingid').text();
+					localStorage.setItem('callNumber', callingid);
+					localStorage.setItem('calledtype', "outbound");
+					localStorage.setItem("softphonestate", 'outgoingcall');
+					localStorage.setItem('callLogSubject', 'Call On');
+					$('#number').html('Call To: ' + callingid);
+					break;
+				case 'CallAnsweredEvent':
+					console.log("CallAnsweredEvent received");
+					var callstarttime = new Date().getTime();
+					localStorage.setItem('callStartTime', callstarttime);
+					$('#number').text('Talking');
+					localStorage.setItem("softphonestate", 'busy');
+					//change background color of "call" icon to #ff0000(red)
+					$('#call').css('background-color', '#ff0000');
+					var callerid = $(mainXhr.responseText).find('callerid').text();
+					sforce.interaction.searchAndScreenPop(callerid,'','inbound');
+					break;
+				case 'CallReleasedEvent':
+					console.log("CallReleasedEvent received");
+					var callendtime = new Date().getTime();
+					localStorage.setItem('callEndTime', callendtime);
+					localStorage.setItem("softphonestate", 'free');
+					localStorage.setItem('callDisposition', 'successfull');
+					$('#number').html("");
+					//change background color of "call" icon to #0c3(green)
+					$('#call').css('background-color', '#093');
+					sforce.interaction.getPageInfo(saveCallLog); //save call log in SFDC
+					break;
+				default:
+			}
 		}
 	};
 	mainXhr.onloadend = function() {
-		console.log('mainXhr.onloadend. Will reopen the channel');
 		connect(username);
 	};
 
@@ -87,12 +88,11 @@ function connect(username){
 
 // Callback of API method: setSoftphoneHeight
 var setSoftphoneHeightCallback = function (response) {
-  	console.log("setSoftphoneHeightCallback called");
 	// Returns true if SoftPhone height was set successfully, false otherwise.
     if (response.result) {
         console.log('Setting SoftPhone height was successful.');
     }else {
-            console.log('Setting softphone height failed.');
+        console.log('Setting softphone height failed.');
     }
 };
 
@@ -103,7 +103,6 @@ function setSoftphoneHeight(height) {
 
 click2diallistener = function (response) {
 	if (response.result) {
-        console.log('User clicked on a phone number.' + response.result );
         sforce.interaction.setVisible(true);
         if(localStorage.getItem('softphonestate') === 'free'){
             var result = JSON.parse(response.result);
@@ -118,11 +117,8 @@ setSoftphoneHeight(500);
 
 $('document').ready(function(){
 	if(localStorage.getItem("loggedin") != "true" || !localStorage.getItem("loggedin")){
-		console.log("document ready. Will open Sing In dialog");
 		$( "#credentials-modal-form" ).dialog( "open" );
 	}else {
-		console.log("document ready and already logged in. Will connect with username " +
-		localStorage.getItem(('username')));
 		issignedinserver(localStorage.getItem('username'), function(result){
 			if(result == true){
 				connect(localStorage.getItem("username"));
@@ -194,7 +190,6 @@ issignedinserver = function(username, callback){
 bwlogin = function(username, password){
 	$.ajax({url: "/log_in/?username=" + username + "&password=" + password, 
 		success:function(result){
-			console.log("result: " + result);
 			$( "#credentials-modal-form" ).dialog( "close" );
 			localStorage.setItem("loggedin", true);
 			localStorage.setItem('username', username);
@@ -205,7 +200,6 @@ bwlogin = function(username, password){
 			$('#loggeduser').text(localStorage.getItem(('username')));
 		},
 		error: function(xhr, status, result){
-			console.log("Status: " + status + "; result: " + result);
 			if(xhr.status == 404){
 				alert(xhr.status + " - " + result + ": Please verify your credentials");
 			}
@@ -216,7 +210,6 @@ bwlogin = function(username, password){
 bwlogout = function(username){
 	$.ajax({url: "/log_out/?username=" + username, 
 		success:function(result){
-			console.log("result: " + result);
 			localStorage.removeItem('softphonestate');
 			localStorage.removeItem('loggedin');
 			localStorage.removeItem('username');
@@ -269,7 +262,6 @@ makecall = function(destination){
 };
 
 saveCallLog = function (response) {
-	console.log("saveLog called with response: " + response.result);
     var timeStamp = new Date().toString();
     timeStamp = timeStamp.substring(0, timeStamp.lastIndexOf(':') + 3);             
     var currentDate = new Date();           
@@ -300,12 +292,11 @@ saveCallLog = function (response) {
     } else {
         saveParams += '&whatId=' + result.objectId;            
     }
-    console.log("Parameters to save in the call log: " + saveParams);
     sforce.interaction.saveLog('Task', saveParams, function(response){
      	if(response.result){
        		console.log("success in sforce.interaction.saveLog: " + response.result);
        	}else{
-       		console.log("error: " + response.error);
+       		console.log("error in sforce.interaction.saveLog: " + response.error);
        	}
     });       
 };
@@ -314,7 +305,6 @@ $('#call').click(function(){
 	var state = localStorage.getItem("softphonestate");
 	switch(state){
 		case 'free':
-			console.log("free state and is calling to " + $('#number').text());
 			makecall($('#number').text());
 			break;
 		case 'busy':

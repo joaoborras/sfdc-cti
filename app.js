@@ -163,7 +163,6 @@ app.all("/connect/", function(req, res){
 });
 
 app.all("/issignedin/", function(req, res){
-	console.log("/issignedin/ called from user " + req.param('username'));
 	for(var index in credentials){
 		if(credentials[index].username === req.param('username')){
 			res.status(200);
@@ -176,31 +175,26 @@ app.all("/issignedin/", function(req, res){
 
 app.all("/make_call/", function(req, res){
 	console.log("/make_call/ received " + req.query);
-	res.send("Received your request to make a call to " + req.param('destination') + ". Now, wait a bit!");
 	makeCall(req.param('destination'),req.param('username'));
 });
 
 app.all('/accept_call', function(req, res){
 	console.log("/accept_call/ received" + req.query);
-	res.send("Answering the call...");
 	acceptCall(req.param('username'));
 });
 
 app.all('/disconnect_call/', function(req, res){
 	console.log("/disconnect_call/ received" + req.query);
-	res.send("Disconnecting call...")
 	disconnectCall(req.param('username'));
 });
 
 app.all('/decline_call/', function(req, res){
 	console.log("/decline_call/ received" + req.query);
-	res.send("Declining call...")
 	declineCall(req.param('username'));
 });
 
 app.all('/transfer_call/', function(req, res){
 	console.log("/transfer_call/ received" + req.query);
-	res.send("Rejecting call...")
 	transferCall(req.param('username'), req.param('destination')); //TODO: implement rejectCall();
 });
 
@@ -215,7 +209,7 @@ verifyUser = function(username, password, callback){
 	};
 	var http = require('http');
 	var req = http.request(options, function(res) {
-	  log.info("< response from BW for verifyUser: " + res.statusCode + '\r\n');
+	  log.info("<- response from BW for verifyUser: " + res.statusCode + '\r\n');
 	  res.setEncoding('utf8');
 	  var resbody = "";
 	  if(res.statusCode === 200){
@@ -232,11 +226,10 @@ verifyUser = function(username, password, callback){
 	});
 
 	req.end();
-	log.info('> GET ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/profile \r\n");
+	log.info('-> GET ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/profile \r\n");
 };
 
 getDirectoryForUser = function(response, username){
-	console.log("INFO: getDirectoryForUser -> " + username);
 	var password;
 	for(var x in credentials){
 		if(credentials[x].username == username){
@@ -252,7 +245,7 @@ getDirectoryForUser = function(response, username){
 	};
 	var http = require('http');
 	var req = http.request(options, function(res) {
-	  log.info("< response from BW for verifyUser: " + res.statusCode + '\r\n');
+	  log.info("<- response from BW for verifyUser: " + res.statusCode + '\r\n');
 	  res.setEncoding('utf8');
 	  var resbody = "";
 	  res.on('data', function(chunk){
@@ -266,13 +259,13 @@ getDirectoryForUser = function(response, username){
 	});
 
 	req.end();
-	log.info('> GET ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/directories/Group \r\n");
+	log.info('-> GET ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/directories/Group \r\n");
 };
 
 //TODO: probably, will have to open one channel for each user...
 //if so, the function must receive the username and password.
 requestChannel = function(){
-	console.log("INFO: requestChannel ->");
+	console.log("-> INFO: requestChannel");
 	var options = {
 		host: BW_URL,
 		path: "/com.broadsoft.async/com.broadsoft.xsi-events/v2.0/channel",
@@ -324,11 +317,11 @@ requestChannel = function(){
 
 	req.write(xml_data);
 	req.end();
-	log.info('> POST ' + BW_URL + '/com.broadsoft.async/com.broadsoft.xsi-events/v2.0/channel \r\n' + xml_data + '\r\n');
+	log.info('-> POST ' + BW_URL + '/com.broadsoft.async/com.broadsoft.xsi-events/v2.0/channel \r\n' + xml_data + '\r\n');
 };
 
 startHeartbeat = function(){
-	console.log("INFO: startHeartbeat ->");
+	console.log("-> INFO: startHeartbeat");
 	var options = {
 	  host: BW_URL,
 	  path: '/com.broadsoft.xsi-events/v2.0/channel/' + bwconnection.channelId + "/heartbeat",
@@ -337,7 +330,7 @@ startHeartbeat = function(){
 	};
 	var http = require('http');
 	var req = http.request(options, function(res) {
-	  log.info("< response from BW on heartbeat: " + res.statusCode + '\r\n');
+	  log.info("<- response from BW on heartbeat: " + res.statusCode + '\r\n');
 	});
 
 	req.on('error', function(e) {
@@ -345,7 +338,7 @@ startHeartbeat = function(){
 	});
 
 	req.end();
-	log.info('> PUT ' + BW_URL + '/com.broadsoft.xsi-events/v2.0/channel/' + bwconnection.channelId + "/heartbeat \r\n");
+	log.info('-> PUT ' + BW_URL + '/com.broadsoft.xsi-events/v2.0/channel/' + bwconnection.channelId + "/heartbeat \r\n");
 
 	heartbeatIntervalId = setTimeout(function(){
 		if(bwconnection.channelId != ''){
@@ -359,7 +352,7 @@ startHeartbeat = function(){
 
 //need to make a subscription for each user registered
 eventSubscription = function(event){
-	console.log("INFO: eventSubscription ->");
+	console.log("-> INFO: eventSubscription");
 	var options = {
 		host: BW_URL,
 		path: "/com.broadsoft.xsi-events/v2.0/serviceprovider/" + bwconnection.serviceprovider + 
@@ -397,11 +390,11 @@ eventSubscription = function(event){
 
 	req.write(xml_data);
 	req.end();
-	log.info('> POST ' + BW_URL + "/com.broadsoft.xsi-events/v2.0/serviceprovider/" + bwconnection.serviceprovider + "/group/" + bwconnection.groupId + '\r\n' + xml_data + '\r\n');
+	log.info('-> POST ' + BW_URL + "/com.broadsoft.xsi-events/v2.0/serviceprovider/" + bwconnection.serviceprovider + "/group/" + bwconnection.groupId + '\r\n' + xml_data + '\r\n');
 };
 
 sendResponseEvent = function(eventId){
-	console.log("INFO: sendResponseEvent ->");
+	console.log("-> INFO: sendResponseEvent");
 	var options = {
 		host: BW_URL,
 		path: "/com.broadsoft.xsi-events/v2.0/channel/eventresponse",
@@ -428,11 +421,10 @@ sendResponseEvent = function(eventId){
 	req.write(xml_data);
 	req.end();
 
-	log.info('> POST ' + BW_URL + "/com.broadsoft.xsi-events/v2.0/channel/eventresponse \r\n" + xml_data + '\r\n');
+	log.info('-> POST ' + BW_URL + "/com.broadsoft.xsi-events/v2.0/channel/eventresponse \r\n" + xml_data + '\r\n');
 };
 
 parseChunk = function(chunk){ //chunk is already string
-	log.info('< ' + chunk);
 	//now, look for what kind of event we received
 	if(chunk.indexOf('<Channel ') >= 0){ //<Channel event
 		parseString(chunk, function(err, result){
@@ -466,7 +458,7 @@ parseChunk = function(chunk){ //chunk is already string
 				if(calltype == 'Group'){
 					remoteparty = xmldoc.getElementsByTagName('xsi:userId').item(1).firstChild.nodeValue;
 				}
-				console.log("INFO: CallReceivedEvent <- (from: " + remoteparty + " to: " + targetid + ")");
+				console.log("<- INFO: CallReceivedEvent(from: " + remoteparty + " to: " + targetid + ")");
 				var countrycode = xmldoc.getElementsByTagName('xsi:address').item(0).getAttribute('countryCode');
 				if(calltype == 'Network' && remoteparty.indexOf(countrycode) >= 0){
 					remoteparty = remoteparty.replace(countrycode, '0');
@@ -486,7 +478,7 @@ parseChunk = function(chunk){ //chunk is already string
 				}
 				break;
 			case 'CallOriginatedEvent':
-				console.log("INFO: CallOriginatedEvent <-");
+				console.log("<- INFO: CallOriginatedEvent");
 				for(var index in credentials){
 					if(credentials[index].username === targetid){
 						credentials[index].callhalf = xmldoc.getElementsByTagName('xsi:callId').item(0).firstChild.nodeValue; 
@@ -502,12 +494,11 @@ parseChunk = function(chunk){ //chunk is already string
 				}
 				break;
 			case 'CallAnsweredEvent':
-				console.log("INFO: CallAnsweredEvent <-");
+				console.log("<- INFO: CallAnsweredEvent");
 				var countrycode = xmldoc.getElementsByTagName('xsi:address').item(0).getAttribute('countryCode');
 				if(remoteparty.indexOf(countrycode) >= 0){
 					remoteparty = remoteparty.replace(countrycode, '0');
 				}
-				console.log("CallAnswered from userid " + targetid);
 				for(var index in credentials){
 					if(credentials[index].username === targetid){
 						//credentials[index].callhalf = xmldoc.getElementsByTagName('xsi:callId').item(0).firstChild.nodeValue;
@@ -523,7 +514,7 @@ parseChunk = function(chunk){ //chunk is already string
 				}
 				break;
 			case 'CallReleasedEvent':
-				console.log("INFO: CallReleasedEvent <-");
+				console.log("<- INFO: CallReleasedEvent");
 				for(var index in credentials){
 					if(credentials[index].username === targetid){
 						var responseobj = credentials[index].appId;
@@ -531,13 +522,13 @@ parseChunk = function(chunk){ //chunk is already string
 						incomingcallXml += '<eventtype>CallReleasedEvent</eventtype>';
 						incomingcallXml += '</Event>';
 						responseobj.send(incomingcallXml);
-						console.log("INFO: CallReleasedEvent -> SFDC");
+						console.log("-> INFO: CallReleasedEvent");
 						break;
 					}
 				}
 				break;
 			case 'CallHeldEvent':
-				console.log("INFO: CallHeldEvent <-");
+				console.log("<- INFO: CallHeldEvent");
 				for(var index in credentials){
 					if(credentials[index].username === targetid){
 						var responseobj = credentials[index].appId;
@@ -550,7 +541,7 @@ parseChunk = function(chunk){ //chunk is already string
 				}
 				break;
 			case 'CallRedirectedEvent':
-				console.log('INFO: CallRedirectedEvent <-');
+				console.log('<- INFO: CallRedirectedEvent');
 				for(var index in credentials){
 					if(credentials[index].username === targetid){
 						var responseobj = credentials[index].appId;
@@ -563,13 +554,13 @@ parseChunk = function(chunk){ //chunk is already string
 				}
 				break;
 			case 'CallUpdatedEvent':
-				console.log("INFO: CallUpdatedEvent <-");
+				console.log("<- INFO: CallUpdatedEvent");
 				break;
 			case 'CallSubscriptionEvent':
-				console.log("INFO: CallSubscriptionEvent <-");
+				console.log("<- INFO: CallSubscriptionEvent");
 				break;
 			case 'CallTransferredEvent':
-				console.log('INFO: CallTransferredEvent <-');
+				console.log('<- INFO: CallTransferredEvent');
 				break;
 			case 'DoNotDisturbEvent':
 			case 'CallForwardingAlwaysEvent':
@@ -579,11 +570,10 @@ parseChunk = function(chunk){ //chunk is already string
 			default:
 		}
 	}
+	log.info('<- ' + chunk);
 };
 
 //******************************** XSI actions processing work functions ***************************
-//TODO: must receive BW username to be able to process
-//acceptCall = function(username){}
 acceptCall = function(username){
 	var callhalf;
 	var password;
@@ -593,7 +583,7 @@ acceptCall = function(username){
 			password = credentials[i].password;
 		}
 	}
-	console.log("INFO: acceptCall ->");
+	console.log("-> INFO: acceptCall");
 	var options = {
 	  host: BW_URL,
 	  path: "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callhalf + "/talk",
@@ -610,11 +600,11 @@ acceptCall = function(username){
 	});
 
 	req.end();
-	log.info('> PUT ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callhalf + "/talk \r\n");
+	log.info('-> PUT ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callhalf + "/talk \r\n");
 };
 
 makeCall = function(destination, username){
-	console.log("INFO: makeCall -> destination " + destination + " and username " + username);
+	console.log("-> INFO: makeCall to destination " + destination + " and username " + username);
 	var password;
 	for(var i in credentials){
 		if(credentials[i].username === username){
@@ -636,12 +626,11 @@ makeCall = function(destination, username){
 	});
 
 	req.end();
-	log.info('> POST ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/new?address=" + encodeURIComponent(destination) + '\r\n');
+	log.info('-> POST ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/new?address=" + encodeURIComponent(destination) + '\r\n');
 };
 
 disconnectCall = function(username){
-	console.log("disconnectCall ->");
-	console.log("username is: " + username);
+	console.log("-> disconnectCall");
 	var callhalf;
 	var password;
 	for(var i in credentials){
@@ -658,7 +647,7 @@ disconnectCall = function(username){
 	};
 	var http = require('http');
 	var req = http.request(options, function(res) {
-	  log.info("< response from BW: " + res.statusCode + '\r\n');
+	  log.info("<- response from BW: " + res.statusCode + '\r\n');
 	});
 
 	req.on('error', function(e) {
@@ -666,11 +655,11 @@ disconnectCall = function(username){
 	});
 
 	req.end();
-	log.info('> DELETE ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callhalf + '\r\n');
+	log.info('-> DELETE ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callhalf + '\r\n');
 };
 
 transferCall = function(username, destination){
-	console.log("transferCall ->");
+	console.log("-> transferCall");
 	var callhalf;
 	var password;
 	for(var i in credentials){
@@ -695,11 +684,11 @@ transferCall = function(username, destination){
 	});
 
 	req.end();
-	log.info('> PUT ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callhalf + "BlindTransfer&=" + destination + '\r\n');
+	log.info('-> PUT ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callhalf + "BlindTransfer&=" + destination + '\r\n');
 };
 
 declineCall = function(username){
-	console.log("declineCall ->");
+	console.log("-> declineCall");
 	console.log("username is: " + username);
 	var callhalf;
 	var password;
@@ -725,20 +714,21 @@ declineCall = function(username){
 	});
 
 	req.end();
-	log.info('> DELETE ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callhalf + "/?decline=true" + '\r\n');
+	log.info('-> DELETE ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callhalf + "/?decline=true" + '\r\n');
 };
 
 //**************** listen for incoming events ***********************
 var opts = {key: fs.readFileSync('key.pem'), cert: fs.readFileSync('cert.pem')};
 
-/*http.createServer(app).listen(app.get('port'), function() {
+http.createServer(app).listen(app.get('port'), function() {
 	console.log('Express server listening on port ' + app.get('port'));
-});*/
+});
 
+/*
 mainhttps = require('https'); //the https object to connect the client with the proxy
 mainhttps.createServer(opts, app).listen(app.get('port'), function(){
 	console.log('Express HTTPS server listening on port ' + app.get('port'));
 });
-
+*/
 //**************** start the server by registering a channel in BW ************
 requestChannel();
