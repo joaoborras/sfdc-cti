@@ -252,7 +252,10 @@ getDirectoryForUser = function(response, username){
 	  var resbody = "";
 	  res.on('data', function(chunk){
 	  	resbody += chunk;
-	  	response.send(resbody);
+	  	if(resbody.indexOf('</Group>') >= 0){
+	  		response.send(resbody);
+	  		resbody = "";
+	  	}
 	  });
 	});
 
