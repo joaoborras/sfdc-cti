@@ -209,7 +209,6 @@ verifyUser = function(username, password, callback){
 	};
 	var http = require('http');
 	var req = http.request(options, function(res) {
-	  log.info("<- response from BW for verifyUser: " + res.statusCode + '\r\n');
 	  res.setEncoding('utf8');
 	  var resbody = "";
 	  if(res.statusCode === 200){
@@ -217,6 +216,7 @@ verifyUser = function(username, password, callback){
 	  	callback(true);
 	  }else{
 	  	console.log("User not found");
+	  	log.error("<- response from BW for verifyUser: " + res.statusCode + '\r\n');
 	  	callback(false);
 	  }
 	});
@@ -245,7 +245,9 @@ getDirectoryForUser = function(response, username){
 	};
 	var http = require('http');
 	var req = http.request(options, function(res) {
-	  log.info("<- response from BW for verifyUser: " + res.statusCode + '\r\n');
+		if(res.statusCode != 200){
+			log.error("<- response from BW for verifyUser: " + res.statusCode + '\r\n');
+		}
 	  res.setEncoding('utf8');
 	  var resbody = "";
 	  res.on('data', function(chunk){
@@ -274,18 +276,17 @@ requestChannel = function(){
 		headers: {'Content-Type': 'text/xml'}
 	};
 	var req = http.request(options, function(res){
-		log.info("< response from BW: " + res.statusCode + '\r\n');
 		if(res.statusCode != 200){
 			console.log("Error in requestChannel. Response status is " + res.statusCode);
 			console.log("Will try again...");
-			log.error("< response from BW: " + res.statusCode + '\r\n');
+			log.error("<- response from BW: " + res.statusCode + '\r\n');
 			log.info("Will try again...");
 			requestChannel();
 		}
 		res.setEncoding('utf8');
 		var resbody = "";
 		res.on('data', function (chunk) {
-			log.info("< " + chunk + '\r\n');
+			log.info("<- " + chunk + '\r\n');
         	resbody += chunk;
         	if(resbody.indexOf(EVENT_CLOSE) >= 0 || resbody.indexOf(CHANNEL_CLOSE) >= 0 || resbody.indexOf(HEARTBEAT_CLOSE) >= 0){
 				parseChunk(resbody);
@@ -330,7 +331,10 @@ startHeartbeat = function(){
 	};
 	var http = require('http');
 	var req = http.request(options, function(res) {
-	  log.info("<- response from BW on heartbeat: " + res.statusCode + '\r\n');
+		if(res.statusCode != 200){
+			log.error("<- response from BW on heartbeat: " + res.statusCode + '\r\n');
+		}
+	  	log.info("<- response from BW on heartbeat: " + res.statusCode + '\r\n');
 	});
 
 	req.on('error', function(e) {
@@ -363,11 +367,14 @@ eventSubscription = function(event){
 	};
 	var http = require('http');
 	var req = http.request(options, function(res){
-		console.log("   received response from BW: " + res.statusCode);
+		if(res.statusCode != 200){
+			console.log("<- Subscription response from BW: " + res.statusCode);
+			log.error("<- Subscription response from BW: " + res.statusCode);
+		}
 		res.setEncoding('utf8');
 		var resbody = "";
 		res.on('data', function (chunk) {
-			log.info('< ' + chunk + '\r\n');
+			log.info('<- ' + chunk + '\r\n');
     	});
 		res.on('end',function(){
 			//TODO
@@ -404,11 +411,14 @@ sendResponseEvent = function(eventId){
 	};
 	var http = require('http');
 	var req = http.request(options, function(res){
-		console.log("< response from BW: " + res.statusCode);
+		if(res.statusCode != 200){
+			console.log("<- response from BW: " + res.statusCode);
+			log.error("<- response from BW: " + res.statusCode);
+		}
 	});
 
 	req.on('error', function(e) {
-  		console.log('   problem with sendResponseEvent request: ' + e.message);
+  		console.log('problem with sendResponseEvent request: ' + e.message);
 	});
 
 	var xml_data = '<?xml version="1.0" encoding="UTF-8"?>';
@@ -456,13 +466,14 @@ parseChunk = function(chunk){ //chunk is already string
 			case 'CallReceivedEvent':
 				var calltype = xmldoc.getElementsByTagName('xsi:callType').item(0).firstChild.nodeValue;
 				if(calltype == 'Group'){
-					remoteparty = xmldoc.getElementsByTagName('xsi:userId').item(1).firstChild.nodeValue;
+					remoteparty = xmldoc.getElementsByTagName('xsi:name').item(0).firstChild.nodeValue;
+				}else if(calltype == 'Network'){
+					var countrycode = xmldoc.getElementsByTagName('xsi:address').item(0).getAttribute('countryCode');
+					if(remoteparty.indexOf(countrycode) >= 0){
+						remoteparty = remoteparty.replace(countrycode, '0');
+					}
 				}
 				console.log("<- INFO: CallReceivedEvent(from: " + remoteparty + " to: " + targetid + ")");
-				var countrycode = xmldoc.getElementsByTagName('xsi:address').item(0).getAttribute('countryCode');
-				if(calltype == 'Network' && remoteparty.indexOf(countrycode) >= 0){
-					remoteparty = remoteparty.replace(countrycode, '0');
-				}
 				for(var index in credentials){
 					if(credentials[index].username === targetid){
 						credentials[index].callhalf = xmldoc.getElementsByTagName('xsi:callId').item(0).firstChild.nodeValue; 
@@ -592,11 +603,13 @@ acceptCall = function(username){
 	};
 	var http = require('http');
 	var req = http.request(options, function(res) {
-	  log.info("< response from BW: " + res.statusCode + '\r\n');
+		if(res.statusCode != 200){
+			log.error("<- response from BW: " + res.statusCode + '\r\n');
+		}
 	});
 
 	req.on('error', function(e) {
-  		log.info('problem with talk PUT: ' + e.message + '\r\n');
+  		log.error('problem with talk PUT: ' + e.message + '\r\n');
 	});
 
 	req.end();
@@ -622,7 +635,7 @@ makeCall = function(destination, username){
 	});
 
 	req.on('error', function(e) {
-  		log.info('problem with talk PUT: ' + e.message + '\r\n');
+  		log.error('problem with talk PUT: ' + e.message + '\r\n');
 	});
 
 	req.end();
@@ -647,7 +660,9 @@ disconnectCall = function(username){
 	};
 	var http = require('http');
 	var req = http.request(options, function(res) {
-	  log.info("<- response from BW: " + res.statusCode + '\r\n');
+		if(res.statusCode != 200){
+			log.error("<- response from BW: " + res.statusCode + '\r\n');
+		}
 	});
 
 	req.on('error', function(e) {
@@ -676,7 +691,9 @@ transferCall = function(username, destination){
 	};
 	var http = require('http');
 	var req = http.request(options, function(res) {
-	  log.info("< response from BW: " + res.statusCode + '\r\n');
+	  if(res.statusCode != 200){
+			log.error("<- response from BW: " + res.statusCode + '\r\n');
+		}
 	});
 
 	req.on('error', function(e) {
@@ -706,7 +723,9 @@ declineCall = function(username){
 	};
 	var http = require('http');
 	var req = http.request(options, function(res) {
-	  log.info("< response from BW: " + res.statusCode + '\r\n');
+	  if(res.statusCode != 200){
+			log.error("<- response from BW: " + res.statusCode + '\r\n');
+		}
 	});
 
 	req.on('error', function(e) {
@@ -720,15 +739,13 @@ declineCall = function(username){
 //**************** listen for incoming events ***********************
 var opts = {key: fs.readFileSync('key.pem'), cert: fs.readFileSync('cert.pem')};
 
-http.createServer(app).listen(app.get('port'), function() {
+/*http.createServer(app).listen(app.get('port'), function() {
 	console.log('Express server listening on port ' + app.get('port'));
-});
+});*/
 
-/*
 mainhttps = require('https'); //the https object to connect the client with the proxy
 mainhttps.createServer(opts, app).listen(app.get('port'), function(){
 	console.log('Express HTTPS server listening on port ' + app.get('port'));
 });
-*/
 //**************** start the server by registering a channel in BW ************
 requestChannel();
