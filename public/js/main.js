@@ -82,7 +82,6 @@ function connect(username){
 	mainXhr.onloadend = function() {
 		connect(username);
 	};
-
 	mainXhr.send();
 };
 
@@ -171,7 +170,7 @@ $( "#credentials-modal-form" ).dialog({
 }); 
 //End of Sign In modal form
 
-//Sign out process will only delete all localStorage variables
+//Sign out process will delete all localStorage variables and sign out the proxy
 $('#signout').click(function(){
 	bwlogout(localStorage.getItem('username'));
 });
@@ -271,7 +270,7 @@ saveCallLog = function (response) {
             
     var dueDate = currentYear+ '-' + currentMonth + '-' + currentDay;
     var saveParams = 'Subject=' + localStorage.getItem('callLogSubject') + timeStamp;
-    saveParams += '&Status=Completed';                 
+    saveParams += '&Status=In Progress';                 
     //saveParams += '&CallType=' + localStorage.getItem('calledtype');
     saveParams += '&Activitydate=' + dueDate;
     //saveParams += '&CallObject=' + currentDate.getTime();

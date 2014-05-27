@@ -68,7 +68,8 @@ if ('development' == app.get('env')) {
 //******************* commands from client(ZD app or test web page) ************************
 //TODO: the Access-Control is not working -> have to check it
 app.all('*', function(req, res, next){
-  	res.header("Access-Control-Allow-Origin", "https://pbxltest.zendesk.com");
+  	//res.header("Access-Control-Allow-Origin", "https://pbxltest.zendesk.com");
+  	res.header("Access-Control-Allow-Origin", "*");
   	res.header("Access-Control-Allow-Headers", "X-Requested-With, Access-Control-Allow-Credentials, Authorization");
   	res.header("Access-Control-Allow-Credentials", true);
   	next();
