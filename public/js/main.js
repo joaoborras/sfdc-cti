@@ -279,10 +279,10 @@ saveCallLog = function (response) {
             
     var dueDate = currentYear+ '-' + currentMonth + '-' + currentDay;
     var saveParams = 'Subject=' + localStorage.getItem('callLogSubject') + timeStamp;
-    saveParams += '&Status=completed';                 
-    saveParams += '&CallType=' + localStorage.getItem('calledtype');
+    saveParams += '&Status=Completed';                 
+    //saveParams += '&CallType=' + localStorage.getItem('calledtype');
     saveParams += '&Activitydate=' + dueDate;
-    saveParams += '&CallObject=' + currentDate.getTime();
+    //saveParams += '&CallObject=' + currentDate.getTime();
     saveParams += '&Phone=' + localStorage.getItem('callNumber');   
     saveParams += '&Description=Test call';//TODO: have to opena dialog for the agent to 
     //fill in the text + callLogText.value;   
@@ -290,14 +290,15 @@ saveCallLog = function (response) {
     if(callDisposition) {
         saveParams += '&CallDisposition=' + callDisposition.value;       
     } */
-    saveParams += '&CallDisposition=' + localStorage.getItem('callDisposition');
-    saveParams += '&CallDurationInSeconds=' + Math.floor((currentDate.getTime() - localStorage.getItem('callStartTime')/ 1000));
+    //saveParams += '&CallDisposition=' + localStorage.getItem('callDisposition');
+    //saveParams += '&CallDurationInSeconds=' + Math.floor((currentDate.getTime() - localStorage.getItem('callStartTime')/ 1000));
+    saveParams += '&Priority=High';
             
     var result = JSON.parse(response.result);
     if(result.objectId.substr(0,3) == '003') {
-        saveParams += '&Who=' + result.objectId;                    
+        saveParams += '&whoId=' + result.objectId;                    
     } else {
-        saveParams += '&What=' + result.objectId;            
+        saveParams += '&whatId=' + result.objectId;            
     }
     console.log("Parameters to save in the call log: " + saveParams);
     sforce.interaction.saveLog('Task', saveParams, function(response){
@@ -306,7 +307,7 @@ saveCallLog = function (response) {
        	}else{
        		console.log("error: " + response.error);
        	}
-    });         
+    });       
 };
 
 $('#call').click(function(){
