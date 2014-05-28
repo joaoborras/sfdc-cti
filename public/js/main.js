@@ -27,6 +27,26 @@ $('#show_hidedialpad').click(function(){
     }
 });
 
+//only tests
+function searchAndGetScreenPopUrl(){
+	console.log('searchAndGetScreenPopUrl called');
+	//Invokes API method
+    sforce.interaction.searchAndGetScreenPopUrl('09061916682', '', 'inbound', searchAndGetScreenPopUrl_callback);
+};
+
+var searchAndGetScreenPopUrl_callback = function (response){
+	console.log("searchAndGetScreenPopUrl_callback called");
+    if (response.result) {
+    	console.log(response.result);
+    	var obj = JSON.parse(response.result);
+    	var userIdentifier = obj.screenPopUrl.replace('/', '');
+    	alert("Hello " + obj[userIdentifier].Name);
+    }else{
+    	alert(response.error);
+    }
+};
+//until here
+
 function startHeartbeat(){
 	setTimeout(function(){
 		$.ajax({

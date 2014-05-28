@@ -77,16 +77,19 @@ app.all('*', function(req, res, next){
 
 app.all('/', function(req, res, next){
   	console.log("/ received " + req.query);
+  	log.info('<- / received ');
 	res.send('public/pbxlSoftPhone.html');
  });
 
 app.all('/getuser_info/', function(req, res){
   	console.log("/getuser_info/ received " + req.query);
+  	log.info('<- /getuser_info/');
 	getName(res);
  });
 
 app.all('/get_directoryforuser/', function(req, res){
   	console.log("/get_directoryforuser/ received " + req.query);
+  	log.info('<- /get_directoryforuser/ from: ' + req.param('username');
 	getDirectoryForUser(res, req.param('username'));
  });
 
@@ -136,6 +139,7 @@ app.all("/log_in/", function(req, res){
 
 app.all("/log_out/", function(req, res){
 	console.log("/log_out/ called from user " + req.param('username'));
+	log.info('<- /log_out/ called from user ' + req.param('username'));
 	for(var index in credentials){
 		if(credentials[index].username === req.param('username')){
 			console.log("found user " + req.param('username') + " in credentials and will now delete it");
@@ -153,6 +157,7 @@ app.all("/log_out/", function(req, res){
 
 app.all("/connect/", function(req, res){
 	console.log("/connect/ called from user " + req.param('username'));
+	log.info('<- /connect/ called from user ' + req.param('username'));
 	for(var index in credentials){
 		if(credentials[index].username === req.param('username')){
 			console.log("found user " + req.param('username') + " in credentials and will now connect it");
@@ -164,6 +169,7 @@ app.all("/connect/", function(req, res){
 });
 
 app.all("/issignedin/", function(req, res){
+	log.info('<- /issignedin/ from ' + req.param('username'));
 	for(var index in credentials){
 		if(credentials[index].username === req.param('username')){
 			res.status(200);
@@ -176,16 +182,19 @@ app.all("/issignedin/", function(req, res){
 
 app.all("/make_call/", function(req, res){
 	console.log("/make_call/ received " + req.query);
+	log.info('<- /make_call/ from: ' + req.param('username') + 'to: ' + req.param('destination'));
 	makeCall(req.param('destination'),req.param('username'));
 });
 
 app.all('/accept_call', function(req, res){
 	console.log("/accept_call/ received" + req.query);
+	log.info('<- /accept_call/ from: ' + req.param('username'));
 	acceptCall(req.param('username'));
 });
 
 app.all('/disconnect_call/', function(req, res){
 	console.log("/disconnect_call/ received" + req.query);
+	log.info('<- /disconnect_call/ from: ' + req.param('username'));
 	disconnectCall(req.param('username'));
 });
 
@@ -196,6 +205,7 @@ app.all('/decline_call/', function(req, res){
 
 app.all('/transfer_call/', function(req, res){
 	console.log("/transfer_call/ received" + req.query);
+	log.info('<- /transfer_call/ from: ' + req.param('username') + ' to: ' + req.param('destination'));
 	transferCall(req.param('username'), req.param('destination')); //TODO: implement rejectCall();
 });
 
