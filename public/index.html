@@ -16,14 +16,16 @@
 </head>
 <body>
 	<!-- jQuery dial-pad -->
-	<div>
-	    <table>
-	        <tr>
-	            <td id='visor' colspan=3>
-	                <sup>User:<span id='loggeduser'></span></sup>
+	<table>
+	    <tr>
+	        <td id='visor' colspan=3>
+	            <sup>User:<span id='loggeduser'></span></sup>
 	                <p id='number'></p>
-	            </td>
-	        </tr>
+	        </td>
+	    </tr> 
+	</table>
+	<div id="dialpad">
+	    <table>   
 	        <tr>
 	            <td class='digit'>1</td>
 	            <td class='digit'>2</td>
@@ -44,29 +46,31 @@
 	            <td class='digit'>0</td>
 	            <td class='digit'>#</td>
 	        </tr>
-	        <tr>
-	            <td class='digit' id='clear'>Clear</td>
-	            <td id='delete'>Delete</td>
-	            <td id='call'>Call</td>
-	        </tr>
-	        <tr>
-	            <td id='hold'>Hold</td>
-	            <td id='transfer'>Transfer</td>
-	        </tr>
 	    </table>
 	</div>
+	<table>
+	    <tr>
+	        <td id='clear'>Clear</td>
+	        <td id='delete'>Delete</td>
+	        <td id='call'>Call</td>
+	    </tr>
+	    <tr>
+	        <td id='hold'>Hold</td>
+	        <td id='transfer'>Transfer</td>
+	    </tr>
+	</table>
 	<!-- end of jQuery dial-pad -->
-
+	<button id="show_hidedialpad" type="button">Show dialpad</button>
+	
 	<!-- the BW credentials modal -->
 	<div id="bw_credentials">
-		<a id="credentials">PBXL</a>
 		<a id="signout">Sign Out</a>
 		<form id="credentials-modal-form">
 			<fieldset>
 				<label id="label_username">User Name:</label><br>
 				<input class="text ui-widget-content ui-corner-all" class="modal-field" id="username" type="text" name="username" size="30" value="BWS_Test.zentestuser1@pbxl.net"><br>
 				<label id="label_password">Password:</label><br>
-				<input class="text ui-widget-content ui-corner-all" class="modal-field" id="password" type="text" name="password" value="Borras123"><br>
+				<input class="text ui-widget-content ui-corner-all" class="modal-field" id="password" type="password" name="password" value="Borras123"><br>
 			</fieldset>
 		</form>
 	</div>

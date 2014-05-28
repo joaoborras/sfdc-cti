@@ -8,11 +8,14 @@ td{
 table{
     width:100%;
 }
-sup{
+sup, #show_hidedialpad{
     font-size:10px;
 }
 .digit, #delete, #call, #hold, #transfer{
     cursor:pointer;
+}
+#dialpad{
+    display:none;
 }
 #visor{
     height:50px;

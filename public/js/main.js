@@ -14,6 +14,19 @@ $('#delete').click(function(){
     $('#number').html(text);
 });
 
+$('#show_hidedialpad').click(function(){
+    var dialpaddisplay = $('#dialpad').css('display');
+    if(dialpaddisplay == 'none'){
+        $('#dialpad').css('display', 'inline');
+        localStorage.setItem('dialpadstatus', 'inline');
+        $(this).text("Hide dialpad");
+    }else if(dialpaddisplay == 'inline'){
+        $('#dialpad').css('display', 'none');
+        localStorage.setItem('dialpadstatus', 'none');
+        $(this).text("Show dialpad");
+    }
+});
+
 function startHeartbeat(){
 	setTimeout(function(){
 		$.ajax({
@@ -138,13 +151,18 @@ $('document').ready(function(){
 	}else {
 		$('#call').css('background-color', '#093');
 	}
+	//this is to maitain the dialpad display mode during pages refreshes
+	var dialpaddisplay = localStorage.getItem('dialpadstatus'); 
+	if(dialpaddisplay == 'none'){
+        $('#dialpad').css('display', 'none');
+        $('#show_hidedialpad').text("Show dialpad");
+    }else if(dialpaddisplay == 'inline'){
+        $('#dialpad').css('display', 'inline');
+        $('#show_hidedialpad').text("Hide dialpad");
+    }
 });
 
 //Sign In modal form
-$('#credentials').click(function(){
-	$( "#credentials-modal-form" ).dialog( "open" );
-});
-
 $( "#credentials-modal-form" ).dialog({
 	autoOpen: false,
     modal: true,
