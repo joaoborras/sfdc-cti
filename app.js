@@ -488,6 +488,7 @@ parseChunk = function(chunk){ //chunk is already string
 						incomingcallXml += '</Event>';
 						responseobj.send(incomingcallXml);
 						console.log("INFO: CallReceivedEvent -> SFDC");
+						log.info("CallReceivedEvent -> SFDC(" + targetid + ")");
 						break;
 					}
 				}
@@ -503,6 +504,7 @@ parseChunk = function(chunk){ //chunk is already string
 						outgoingcallXml += '<callingid>' + remoteparty + '</callingid>';
 						outgoingcallXml += '</Event>';
 						responseobj.send(outgoingcallXml);
+						log.info("CallOriginatedEvent -> SFDC(" + targetid + ")");
 						console.log("INFO: CallOriginatedEvent -> SFDC");
 						break;
 					}
@@ -523,6 +525,7 @@ parseChunk = function(chunk){ //chunk is already string
 						incomingcallXml += '<callerid>' + remoteparty + '</callerid>';
 						incomingcallXml += '</Event>';
 						responseobj.send(incomingcallXml);
+						log.info("CallAnswered -> SFDC(" + targetid + ")");
 						console.log("INFO: CallAnswered -> SFDC");
 						break;
 					}
@@ -537,6 +540,7 @@ parseChunk = function(chunk){ //chunk is already string
 						incomingcallXml += '<eventtype>CallReleasedEvent</eventtype>';
 						incomingcallXml += '</Event>';
 						responseobj.send(incomingcallXml);
+						log.info("CallReleasedEvent -> SFDC(" + targetid + ")");
 						console.log("-> INFO: CallReleasedEvent");
 						break;
 					}
@@ -585,7 +589,6 @@ parseChunk = function(chunk){ //chunk is already string
 			default:
 		}
 	}
-	log.info('<- ' + chunk);
 };
 
 //******************************** XSI actions processing work functions ***************************
