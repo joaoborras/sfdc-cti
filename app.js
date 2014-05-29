@@ -468,24 +468,34 @@ parseChunk = function(chunk){ //chunk is already string
 		eventSubscription('Advanced Call');
 	}else if(chunk.indexOf('<xsi:Event ') >= 0){//xsi:Event received. Now see if it is channel disconnection
 		//for every xsi:Event, needs to send event Response
-		var xmldoc = new DOMParser().parseFromString(chunk,'text/xml');	
-		var eventid = xmldoc.getElementsByTagName('xsi:eventID').item(0).firstChild.nodeValue;
-		sendResponseEvent(eventid);
-		var userid = xmldoc.getElementsByTagName('xsi:userId').item(0).firstChild.nodeValue;
-		var targetid = xmldoc.getElementsByTagName('xsi:targetId').item(0).firstChild.nodeValue;
-		var remoteparty = xmldoc.getElementsByTagName('xsi:address').item(0).firstChild.nodeValue.substring(5);
-		var eventType = xmldoc.getElementsByTagName('xsi:eventData').item(0).getAttribute('xsi1:type').trim();
-		eventType = eventType.substring(4);//string off the prefix "xsi:" from the eventType
+		try{
+			var xmldoc = new DOMParser().parseFromString(chunk,'text/xml');	
+			var eventid = xmldoc.getElementsByTagName('xsi:eventID').item(0).firstChild.nodeValue;
+			sendResponseEvent(eventid);
+			var userid = xmldoc.getElementsByTagName('xsi:userId').item(0).firstChild.nodeValue;
+			var targetid = xmldoc.getElementsByTagName('xsi:targetId').item(0).firstChild.nodeValue;
+			var remoteparty = xmldoc.getElementsByTagName('xsi:address').item(0).firstChild.nodeValue.substring(5);
+			var eventType = xmldoc.getElementsByTagName('xsi:eventData').item(0).getAttribute('xsi1:type').trim();
+			eventType = eventType.substring(4);//string off the prefix "xsi:" from the eventType
+		}catch(error){
+			//TODO: for now, do nothing as it means that some event does not contains the 
+			//searched node
+		}
 		switch(eventType){
 			case 'CallReceivedEvent':
-				var calltype = xmldoc.getElementsByTagName('xsi:callType').item(0).firstChild.nodeValue;
-				if(calltype == 'Group'){
-					remoteparty = xmldoc.getElementsByTagName('xsi:name').item(0).firstChild.nodeValue;
-				}else if(calltype == 'Network'){
-					var countrycode = xmldoc.getElementsByTagName('xsi:address').item(0).getAttribute('countryCode');
-					if(remoteparty.indexOf(countrycode) >= 0){
-						remoteparty = remoteparty.replace(countrycode, '0');
+				try{
+					var calltype = xmldoc.getElementsByTagName('xsi:callType').item(0).firstChild.nodeValue;
+					if(calltype == 'Group'){
+						remoteparty = xmldoc.getElementsByTagName('xsi:name').item(0).firstChild.nodeValue;
+					}else if(calltype == 'Network'){
+						var countrycode = xmldoc.getElementsByTagName('xsi:address').item(0).getAttribute('countryCode');
+						if(remoteparty.indexOf(countrycode) >= 0){
+							remoteparty = remoteparty.replace(countrycode, '0');
+						}
 					}
+				}catch(error){
+					//TODO: for now, do nothing as it means that some event does not contains the 
+					//searched node
 				}
 				console.log("<- INFO: CallReceivedEvent(from: " + remoteparty + " to: " + targetid + ")");
 				for(var index in credentials){
@@ -522,7 +532,13 @@ parseChunk = function(chunk){ //chunk is already string
 				break;
 			case 'CallAnsweredEvent':
 				console.log("<- INFO: CallAnsweredEvent");
-				var countrycode = xmldoc.getElementsByTagName('xsi:address').item(0).getAttribute('countryCode');
+				var countrycode;
+				try{
+					countrycode = xmldoc.getElementsByTagName('xsi:address').item(0).getAttribute('countryCode');
+				}catch(error){
+					//TODO: for now, do nothing as it means that some event does not contains the 
+					//searched node
+				}
 				if(remoteparty.indexOf(countrycode) >= 0){
 					remoteparty = remoteparty.replace(countrycode, '0');
 				}
