@@ -89,7 +89,7 @@ app.all('/getuser_info/', function(req, res){
 
 app.all('/get_directoryforuser/', function(req, res){
   	console.log("/get_directoryforuser/ received " + req.query);
-  	log.info('<- /get_directoryforuser/ from: ' + req.param('username');
+  	log.info('<- /get_directoryforuser/ from: ' + req.param('username'));
 	getDirectoryForUser(res, req.param('username'));
  });
 
