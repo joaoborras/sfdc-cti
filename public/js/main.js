@@ -81,7 +81,7 @@ function connect(username){
 					localStorage.setItem("softphonestate", 'incomingcall');
 					localStorage.setItem('callLogSubject', 'Call On');
 					identifyCaller(callerid);
-					sforce.interaction.searchAndScreenPop(callerid,'','inbound');
+					//sforce.interaction.searchAndScreenPop(callerid,'','inbound');
 					break;
 				case 'CallOriginatedEvent':
 					console.log("CallOriginatedEvent received");
@@ -100,8 +100,8 @@ function connect(username){
 					localStorage.setItem("softphonestate", 'busy');
 					//change background color of "call" icon to #ff0000(red)
 					$('#call').css('background-color', '#ff0000');
-					//var callerid = $(mainXhr.responseText).find('callerid').text();
-					//sforce.interaction.searchAndScreenPop(callerid,'','inbound');
+					var callerid = $(mainXhr.responseText).find('callerid').text();
+					sforce.interaction.searchAndScreenPop(callerid,'','inbound');
 					break;
 				case 'CallReleasedEvent':
 					console.log("CallReleasedEvent received");
