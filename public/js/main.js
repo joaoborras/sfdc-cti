@@ -27,25 +27,30 @@ $('#show_hidedialpad').click(function(){
     }
 });
 
-//only tests
-function searchAndGetScreenPopUrl(){
+function identifyCaller(caller){
 	console.log('searchAndGetScreenPopUrl called');
 	//Invokes API method
-    sforce.interaction.searchAndGetScreenPopUrl('09061916682', '', 'inbound', searchAndGetScreenPopUrl_callback);
+    sforce.interaction.searchAndGetScreenPopUrl(caller, '', 'inbound', identifyCaller_callback);
 };
 
-var searchAndGetScreenPopUrl_callback = function (response){
+var identifyCaller_callback = function (response){
 	console.log("searchAndGetScreenPopUrl_callback called");
     if (response.result) {
     	console.log(response.result);
     	var obj = JSON.parse(response.result);
-    	var userIdentifier = obj.screenPopUrl.replace('/', '');
-    	alert("Hello " + obj[userIdentifier].Name);
+    	if(obj.screenPopUrl != ''){
+    		var userIdentifier = obj.screenPopUrl.replace('/', '');
+    		//alert("Hello " + obj[userIdentifier].Name);
+    		//$('#number').text('Call From: ' + obj[userIdentifier].Name);
+    		localStorage.setItem('callingParty', obj[userIdentifier].Name)
+    	}else{
+    		//$('#number').text('Call From: ' + localStorage.getItem('callingParty'));
+    	}
     }else{
-    	alert(response.error);
+    	console.log(response.error);
     }
+    $('#number').text('Call From: ' + localStorage.getItem('callingParty'));
 };
-//until here
 
 function startHeartbeat(){
 	setTimeout(function(){
@@ -71,11 +76,12 @@ function connect(username){
 				case 'CallReceivedEvent':
 					console.log("CallReceivedEvent received");
 					var callerid = $(mainXhr.responseText).find('callerid').text();
-					localStorage.setItem('callNumber', callerid);
+					localStorage.setItem('callingParty', callerid);
 					localStorage.setItem('calledtype', "inbound");
 					localStorage.setItem("softphonestate", 'incomingcall');
 					localStorage.setItem('callLogSubject', 'Call On');
-					$('#number').text('Call From: ' + callerid);
+					identifyCaller(callerid);
+					sforce.interaction.searchAndScreenPop(callerid,'','inbound');
 					break;
 				case 'CallOriginatedEvent':
 					console.log("CallOriginatedEvent received");
@@ -94,8 +100,8 @@ function connect(username){
 					localStorage.setItem("softphonestate", 'busy');
 					//change background color of "call" icon to #ff0000(red)
 					$('#call').css('background-color', '#ff0000');
-					var callerid = $(mainXhr.responseText).find('callerid').text();
-					sforce.interaction.searchAndScreenPop(callerid,'','inbound');
+					//var callerid = $(mainXhr.responseText).find('callerid').text();
+					//sforce.interaction.searchAndScreenPop(callerid,'','inbound');
 					break;
 				case 'CallReleasedEvent':
 					console.log("CallReleasedEvent received");
@@ -103,6 +109,7 @@ function connect(username){
 					localStorage.setItem('callEndTime', callendtime);
 					localStorage.setItem("softphonestate", 'free');
 					localStorage.setItem('callDisposition', 'successfull');
+					releaseLocalStorage();
 					$('#number').html("");
 					//change background color of "call" icon to #0c3(green)
 					$('#call').css('background-color', '#093');
@@ -116,6 +123,16 @@ function connect(username){
 		connect(username);
 	};
 	mainXhr.send();
+};
+
+releaseLocalStorage = function(){
+	localStorage.removeItem('callEndTime');
+	localStorage.removeItem('callLogSubject');
+	localStorage.removeItem('callNumber');
+	localStorage.removeItem('callStartTime');
+	localStorage.removeItem('calledtype');
+	localStorage.removeItem('callingParty');
+
 };
 
 // Callback of API method: setSoftphoneHeight
@@ -166,10 +183,14 @@ $('document').ready(function(){
 		});
 	}
 	//this is to cope with the fact that sfdc reloads the page during screen pop-up
-	if(localStorage.getItem("softphonestate") == 'busy'){
+	var softphonestate = localStorage.getItem("softphonestate");
+	if(softphonestate == 'busy'){
 		$('#call').css('background-color', '#ff0000');
-	}else {
-		$('#call').css('background-color', '#093');
+		$('#number').text('Talking');
+	}else if(softphonestate == 'incomingcall'){
+		$('#number').text('Call From: ' + localStorage.getItem('callingParty'));
+	}else{
+		$('#call').css('background-color', '#093')
 	}
 	//this is to maitain the dialpad display mode during pages refreshes
 	var dialpaddisplay = localStorage.getItem('dialpadstatus'); 
