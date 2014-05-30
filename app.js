@@ -94,7 +94,20 @@ app.all('/get_directoryforuser/', function(req, res){
  });
 
 app.all('/heartbeat/', function(req, res){
-  	console.log("/heartbeat/ received " + req.query);
+	var username = req.param('username');
+	console.log("<- /heartbeat/ received from " + username);
+	log.info("<- /heartbeat/ received from " + username);
+	for(var x in credentials){
+		if(credentials[x].username == username){
+			var responseobj = credentials[x].appId;
+			var heartbeatresponse = '<Event>';
+			heartbeatresponse += '<eventtype>HeartBeatResponse</eventtype>';
+			heartbeatresponse += '</Event>';
+			responseobj.send(heartbeatresponse);
+			console.log("-> HeartBeatResponse to SFDC(" + username + ")");
+			log.info("-> HeartBeatResponse to SFDC(" + username + ")");
+		}
+	}
 	res.writeHead(200, {'Content-Type': 'text/plain'});
   	res.end();
  });
@@ -156,12 +169,14 @@ app.all("/log_out/", function(req, res){
 });
 
 app.all("/connect/", function(req, res){
-	console.log("/connect/ called from user " + req.param('username'));
+	console.log("<- /connect/ called from user " + req.param('username'));
 	log.info('<- /connect/ called from user ' + req.param('username'));
 	for(var index in credentials){
-		if(credentials[index].username === req.param('username')){
+		if(credentials[index].username == req.param('username')){
 			console.log("found user " + req.param('username') + " in credentials and will now connect it");
 			credentials[index].appId = res;
+			//res.set('Text-Encoding', 'chunked');
+			//res.writeHead(200, {'Content-Type': 'text/plain'});
 		}else{
 			console.log("Username " + req.param('username') + " not in credentials");
 		}
@@ -187,20 +202,21 @@ app.all("/make_call/", function(req, res){
 });
 
 app.all('/accept_call', function(req, res){
-	console.log("/accept_call/ received" + req.query);
+	console.log("<- /accept_call/ received" + req.query);
 	log.info('<- /accept_call/ from: ' + req.param('username'));
 	acceptCall(req.param('username'));
 });
 
 app.all('/disconnect_call/', function(req, res){
-	console.log("/disconnect_call/ received" + req.query);
+	console.log("<- /disconnect_call/ received" + req.query);
 	log.info('<- /disconnect_call/ from: ' + req.param('username'));
-	disconnectCall(req.param('username'));
+	disconnectCall(req.param('username'), req.param('callid'));
 });
 
 app.all('/decline_call/', function(req, res){
-	console.log("/decline_call/ received" + req.query);
-	declineCall(req.param('username'));
+	console.log("<- /decline_call/ received" + req.query);
+	log.info("<- /decline_call/ received" + req.query);
+	declineCall(req.param('username'), req.param('callid'));
 });
 
 app.all('/transfer_call/', function(req, res){
@@ -500,13 +516,16 @@ parseChunk = function(chunk){ //chunk is already string
 				console.log("<- INFO: CallReceivedEvent(from: " + remoteparty + " to: " + targetid + ")");
 				for(var index in credentials){
 					if(credentials[index].username === targetid){
-						credentials[index].callhalf = xmldoc.getElementsByTagName('xsi:callId').item(0).firstChild.nodeValue; 
+						var callid = xmldoc.getElementsByTagName('xsi:callId').item(0).firstChild.nodeValue;
+						credentials[index].callhalf =  callid;
 						var responseobj = credentials[index].appId;
 						var incomingcallXml = '<Event>';
 						incomingcallXml += '<eventtype>CallReceivedEvent</eventtype>';
 						incomingcallXml += '<callerid>' + remoteparty + '</callerid>';
+						incomingcallXml += '<callid>' + callid + '</callid>';
 						incomingcallXml += '</Event>';
 						responseobj.send(incomingcallXml);
+						//responseobj.write(incomingcallXml);
 						console.log("INFO: CallReceivedEvent -> SFDC");
 						log.info("CallReceivedEvent -> SFDC(" + targetid + ")");
 						break;
@@ -514,16 +533,20 @@ parseChunk = function(chunk){ //chunk is already string
 				}
 				break;
 			case 'CallOriginatedEvent':
+				log.info("<- INFO: CallOriginatedEvent");
 				console.log("<- INFO: CallOriginatedEvent");
 				for(var index in credentials){
 					if(credentials[index].username === targetid){
-						credentials[index].callhalf = xmldoc.getElementsByTagName('xsi:callId').item(0).firstChild.nodeValue; 
+						var callid = xmldoc.getElementsByTagName('xsi:callId').item(0).firstChild.nodeValue;
+						credentials[index].callhalf = callid; 
 						var responseobj = credentials[index].appId;
 						var outgoingcallXml = '<Event>';
 						outgoingcallXml += '<eventtype>CallOriginatedEvent</eventtype>';
 						outgoingcallXml += '<callingid>' + remoteparty + '</callingid>';
+						outgoingcallXml += '<callid>' + callid + '</callid>';
 						outgoingcallXml += '</Event>';
 						responseobj.send(outgoingcallXml);
+						//responseobj.write(outgoingcallXml);
 						log.info("CallOriginatedEvent -> SFDC(" + targetid + ")");
 						console.log("INFO: CallOriginatedEvent -> SFDC");
 						break;
@@ -551,6 +574,7 @@ parseChunk = function(chunk){ //chunk is already string
 						incomingcallXml += '<callerid>' + remoteparty + '</callerid>';
 						incomingcallXml += '</Event>';
 						responseobj.send(incomingcallXml);
+						//responseobj.write(incomingcallXml);
 						log.info("CallAnswered -> SFDC(" + targetid + ")");
 						console.log("INFO: CallAnswered -> SFDC");
 						break;
@@ -561,11 +585,14 @@ parseChunk = function(chunk){ //chunk is already string
 				console.log("<- INFO: CallReleasedEvent");
 				for(var index in credentials){
 					if(credentials[index].username === targetid){
+						var callid = xmldoc.getElementsByTagName('xsi:callId').item(0).firstChild.nodeValue;
 						var responseobj = credentials[index].appId;
 						var incomingcallXml = '<Event>';
 						incomingcallXml += '<eventtype>CallReleasedEvent</eventtype>';
+						incomingcallXml += '<callid>' + callid + '</callid>';
 						incomingcallXml += '</Event>';
 						responseobj.send(incomingcallXml);
+						//responseobj.write(incomingcallXml);
 						log.info("CallReleasedEvent -> SFDC(" + targetid + ")");
 						console.log("-> INFO: CallReleasedEvent");
 						break;
@@ -619,6 +646,7 @@ parseChunk = function(chunk){ //chunk is already string
 
 //******************************** XSI actions processing work functions ***************************
 acceptCall = function(username){
+	console.log("acceptCall and username is " + username);
 	var callhalf;
 	var password;
 	for(var i in credentials){
@@ -675,7 +703,38 @@ makeCall = function(destination, username){
 	log.info('-> POST ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/new?address=" + encodeURIComponent(destination) + '\r\n');
 };
 
-disconnectCall = function(username){
+disconnectCall = function(username, callid){
+	console.log("-> disconnectCall: " + callid);
+	var callhalf;
+	var password;
+	for(var i in credentials){
+		if(credentials[i].username === username){
+			callhalf = credentials[i].callhalf;
+			password = credentials[i].password;
+		}
+	}
+	var options = {
+	  host: BW_URL,
+	  path: "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callid,
+	  method: 'DELETE',
+	  auth: username + ":" + password
+	};
+	var http = require('http');
+	var req = http.request(options, function(res) {
+		if(res.statusCode != 200){
+			log.error("<- response from BW: " + res.statusCode + '\r\n');
+		}
+	});
+
+	req.on('error', function(e) {
+  		log.info('problem with talk DELETE: ' + e.message + '\r\n');
+	});
+
+	req.end();
+	log.info('-> DELETE ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callid + '\r\n');
+};
+
+disconnectCall2 = function(username){
 	console.log("-> disconnectCall");
 	var callhalf;
 	var password;
@@ -737,7 +796,7 @@ transferCall = function(username, destination){
 	log.info('-> PUT ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callhalf + "BlindTransfer&=" + destination + '\r\n');
 };
 
-declineCall = function(username){
+declineCall = function(username, callid){
 	console.log("-> declineCall");
 	console.log("username is: " + username);
 	var callhalf;
@@ -750,7 +809,7 @@ declineCall = function(username){
 	}
 	var options = {
 	  host: BW_URL,
-	  path: "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callhalf + "/?decline=true",
+	  path: "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callid + "/?decline=true",
 	  method: 'DELETE',
 	  auth: username + ":" + password
 	};
@@ -766,7 +825,7 @@ declineCall = function(username){
 	});
 
 	req.end();
-	log.info('-> DELETE ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callhalf + "/?decline=true" + '\r\n');
+	log.info('-> DELETE ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callid + "/?decline=true" + '\r\n');
 };
 
 //**************** listen for incoming events ***********************

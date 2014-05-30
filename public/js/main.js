@@ -40,11 +40,7 @@ var identifyCaller_callback = function (response){
     	var obj = JSON.parse(response.result);
     	if(obj.screenPopUrl != ''){
     		var userIdentifier = obj.screenPopUrl.replace('/', '');
-    		//alert("Hello " + obj[userIdentifier].Name);
-    		//$('#number').text('Call From: ' + obj[userIdentifier].Name);
     		localStorage.setItem('callingParty', obj[userIdentifier].Name)
-    	}else{
-    		//$('#number').text('Call From: ' + localStorage.getItem('callingParty'));
     	}
     }else{
     	console.log(response.error);
@@ -52,9 +48,18 @@ var identifyCaller_callback = function (response){
     $('#number').text('Call From: ' + localStorage.getItem('callingParty'));
 };
 
+var searchAndGetScreenPopUrl_callback = function(response){
+	if(response.result){
+		console.log('searchAndGetScreenPopUrl response: ' + response.result);
+	}else{
+		console.log(response.error);
+	}
+};
+
 function startHeartbeat(){
 	setTimeout(function(){
 		$.ajax({
+			cache:false,
 			url: '/heartbeat/?username=' + localStorage.getItem('username'),
 			success:function(result){
 				startHeartbeat();
@@ -69,31 +74,44 @@ function connect(username){
 	var url = '/connect/?username=' + username;
 	mainXhr.open('GET', url, true);
 	mainXhr.onreadystatechange = function() {
-		console.log('mainXhr.onreadystatechange called. State is ' + mainXhr.readyState);
 		if(mainXhr.readyState == 4){
+			console.log(mainXhr.responseText);
 			var eventtype = $(mainXhr.responseText).find('eventtype').text();
 			switch(eventtype){
+				case 'HeartBeatResponse':
+					console.log('<- HeartBeatResponse');
+					break;
 				case 'CallReceivedEvent':
-					console.log("CallReceivedEvent received");
+					var callid = $(mainXhr.responseText).find('callid').text();
 					var callerid = $(mainXhr.responseText).find('callerid').text();
-					localStorage.setItem('callingParty', callerid);
-					localStorage.setItem('calledtype', "inbound");
-					localStorage.setItem("softphonestate", 'incomingcall');
-					localStorage.setItem('callLogSubject', 'Call On');
-					identifyCaller(callerid);
-					//sforce.interaction.searchAndScreenPop(callerid,'','inbound');
+					console.log("<- CallReceivedEvent(callerid: " + callerid + "; callid: " + callid);
+					var softphonestate = localStorage.getItem('softphonestate');
+					if(softphonestate == "free" || softphonestate == "outgoingcall"){//only gets first call
+						localStorage.setItem('callingParty', callerid);
+						localStorage.setItem('callId', callid);
+						localStorage.setItem('calledtype', "inbound");
+						localStorage.setItem("softphonestate", 'incomingcall');
+						localStorage.setItem('callLogSubject', 'Call On');
+						identifyCaller(callerid);
+						//sforce.interaction.searchAndScreenPop(callerid,'','inbound');
+						pulseCallButton();
+					}else{
+						declinecall(callid);
+					}
 					break;
 				case 'CallOriginatedEvent':
-					console.log("CallOriginatedEvent received");
+					var callid = $(mainXhr.responseText).find('callid').text();
 					var callingid = $(mainXhr.responseText).find('callingid').text();
+					console.log("<- CallOriginatedEvent(callid: " + callid + ")");
 					localStorage.setItem('callNumber', callingid);
+					localStorage.setItem('callId', callid);
 					localStorage.setItem('calledtype', "outbound");
 					localStorage.setItem("softphonestate", 'outgoingcall');
 					localStorage.setItem('callLogSubject', 'Call On');
 					$('#number').html('Call To: ' + callingid);
 					break;
 				case 'CallAnsweredEvent':
-					console.log("CallAnsweredEvent received");
+					console.log("<- CallAnsweredEvent");
 					var callstarttime = new Date().getTime();
 					localStorage.setItem('callStartTime', callstarttime);
 					$('#number').text('Talking');
@@ -101,28 +119,40 @@ function connect(username){
 					//change background color of "call" icon to #ff0000(red)
 					$('#call').css('background-color', '#ff0000');
 					var callerid = $(mainXhr.responseText).find('callerid').text();
-					sforce.interaction.searchAndScreenPop(callerid,'','inbound');
+					sforce.interaction.searchAndScreenPop(callerid,'','inbound', searchAndGetScreenPopUrl_callback);
 					break;
 				case 'CallReleasedEvent':
-					console.log("CallReleasedEvent received");
-					var callendtime = new Date().getTime();
-					localStorage.setItem('callEndTime', callendtime);
-					localStorage.setItem("softphonestate", 'free');
-					localStorage.setItem('callDisposition', 'successfull');
-					releaseLocalStorage();
-					$('#number').html("");
-					//change background color of "call" icon to #0c3(green)
-					$('#call').css('background-color', '#093');
-					sforce.interaction.getPageInfo(saveCallLog); //save call log in SFDC
+					var callid = $(mainXhr.responseText).find('callid').text();
+					console.log("<- CallReleasedEvent(callid: " + callid + ")");
+					if(callid == localStorage.getItem('callId')){
+						var callendtime = new Date().getTime();
+						localStorage.setItem('callEndTime', callendtime);
+						localStorage.setItem("softphonestate", 'free');
+						localStorage.setItem('callDisposition', 'successfull');
+						$('#number').html("");
+						//change background color of "call" icon to #0c3(green)
+						$('#call').css('background-color', '#093');
+						sforce.interaction.getPageInfo(saveCallLog); //save call log in SFDC
+					}
 					break;
 				default:
 			}
 		}
 	};
 	mainXhr.onloadend = function() {
-		connect(username);
+		connect(localStorage.getItem('username'));
 	};
 	mainXhr.send();
+};
+
+pulseCallButton = function(){
+	$('.pulse').effect('pulsate');
+	setTimeout(function(){
+		if(localStorage.getItem('softphonestate') == "incomingcall"){
+			$('.pulse').effect('pulsate');
+			pulseCallButton();
+		}
+	}, 3000);
 };
 
 releaseLocalStorage = function(){
@@ -234,8 +264,10 @@ $('#signout').click(function(){
 	bwlogout(localStorage.getItem('username'));
 });
 
+//Requests to the proxy from here
 issignedinserver = function(username, callback){  
 	$.ajax({url: "/issignedin/?username=" + username, 
+		cache: false,
 		success:function(result){
 			callback(true);
 		},
@@ -247,6 +279,7 @@ issignedinserver = function(username, callback){
 
 bwlogin = function(username, password){
 	$.ajax({url: "/log_in/?username=" + username + "&password=" + password, 
+		cache: false,
 		success:function(result){
 			$( "#credentials-modal-form" ).dialog( "close" );
 			localStorage.setItem("loggedin", true);
@@ -267,6 +300,7 @@ bwlogin = function(username, password){
 
 bwlogout = function(username){
 	$.ajax({url: "/log_out/?username=" + username, 
+		cache: false,
 		success:function(result){
 			localStorage.removeItem('softphonestate');
 			localStorage.removeItem('loggedin');
@@ -282,7 +316,9 @@ bwlogout = function(username){
 
 acceptcall = function(){
 	var username = localStorage.getItem("username");
+	console.log("acceptcall function called for " + username);
 	$.ajax({url: "/accept_call/?username=" + username, 
+		cache: false,
 		success:function(result){
 			console.log("result: " + result);
 		},
@@ -292,9 +328,38 @@ acceptcall = function(){
 	});
 };
 
-disconnectcall = function(){
+disconnectcall = function(callid){
+	console.log("disconnectcall called for callid: " + callid);
 	var username = localStorage.getItem("username");
-	$.ajax({url: "/disconnect_call/?username=" + username, 
+	$.ajax({url: "/disconnect_call/?username=" + username + "&callid=" + callid,
+		cache: false, 
+		success:function(result){
+			console.log("result: " + result);
+		},
+		error:function(xhr, status, result){
+			console.log("Status: " + status + "; result: " + result);
+		}
+	});
+};
+
+disconnectcall2 = function(){
+	var username = localStorage.getItem("username");
+	$.ajax({url: "/disconnect_call/?username=" + username,
+		cache: false, 
+		success:function(result){
+			console.log("result: " + result);
+		},
+		error:function(xhr, status, result){
+			console.log("Status: " + status + "; result: " + result);
+		}
+	});
+};
+
+declinecall = function(callid){
+	console.log("declinecall called for callid: " + callid);
+	var username = localStorage.getItem("username");
+	$.ajax({url: "/decline_call/?username=" + username + "&callid=" + callid, 
+		cache: false,
 		success:function(result){
 			console.log("result: " + result);
 		},
@@ -307,6 +372,7 @@ disconnectcall = function(){
 makecall = function(destination){
 	var username = localStorage.getItem("username");
 	$.ajax({url: "/make_call/?username=" + username + "&destination=" + destination, 
+		cache: false,
 		success:function(result){
 			$('#number').html("Calling " + destination);
            	localStorage.setItem('callNumber', destination);
@@ -318,6 +384,7 @@ makecall = function(destination){
 		}
 	});
 };
+//Until here
 
 saveCallLog = function (response) {
     var timeStamp = new Date().toString();
@@ -356,17 +423,20 @@ saveCallLog = function (response) {
        	}else{
        		console.log("error in sforce.interaction.saveLog: " + response.error);
        	}
-    });       
+    }); 
+
+    //releaseLocalStorage();      
 };
 
 $('#call').click(function(){
+	event.preventDefault();
 	var state = localStorage.getItem("softphonestate");
 	switch(state){
 		case 'free':
 			makecall($('#number').text());
 			break;
 		case 'busy':
-			disconnectcall();
+			disconnectcall(localStorage.getItem('callId'));
 			break;
 		case 'incomingcall':
 			acceptcall();
@@ -378,7 +448,8 @@ $('#call').click(function(){
 $('#declinecall').click(function(){
 	event.preventDefault();
 	var username = $('#username').val();
-	$.ajax({url: "/decline_call/?username=" + username, 
+	$.ajax({url: "/decline_call/?username=" + username + "&callid=" + callid, 
+		cache: false,
 		success:function(result){
 			console.log("result: " + result);
 		},
