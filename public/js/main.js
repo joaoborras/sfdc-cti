@@ -387,46 +387,57 @@ makecall = function(destination){
 //Until here
 
 saveCallLog = function (response) {
-    var timeStamp = new Date().toString();
-    timeStamp = timeStamp.substring(0, timeStamp.lastIndexOf(':') + 3);             
-    var currentDate = new Date();           
-    var currentDay = currentDate.getDate();
-    var currentMonth = currentDate.getMonth()+1;
-    var currentYear = currentDate.getFullYear();
-            
-    var dueDate = currentYear+ '-' + currentMonth + '-' + currentDay;
-    var saveParams = 'Subject=' + localStorage.getItem('callLogSubject') + timeStamp;
-    saveParams += '&Status=In Progress';                 
-    //saveParams += '&CallType=' + localStorage.getItem('calledtype');
-    saveParams += '&Activitydate=' + dueDate;
-    //saveParams += '&CallObject=' + currentDate.getTime();
-    saveParams += '&Phone=' + localStorage.getItem('callNumber');   
-    saveParams += '&Description=Test call';//TODO: have to opena dialog for the agent to 
-    //fill in the text + callLogText.value;   
-    /*var callDisposition = getSelectedCallDisposition();
-    if(callDisposition) {
-        saveParams += '&CallDisposition=' + callDisposition.value;       
-    } */
-    //saveParams += '&CallDisposition=' + localStorage.getItem('callDisposition');
-    //saveParams += '&CallDurationInSeconds=' + Math.floor((currentDate.getTime() - localStorage.getItem('callStartTime')/ 1000));
-    saveParams += '&Priority=High';
-            
     var result = JSON.parse(response.result);
-    if(result.objectId.substr(0,3) == '003') {
-        saveParams += '&whoId=' + result.objectId;                    
+    localStorage.setItem('resultobjectid', result.objectId);
+    $('#callwrapup').css('display', 'inline');
+};
+
+//control Call Wrap Up form from here
+$( "#duedatepicker" ).datepicker({ dateFormat: "yy-mm-dd" });
+$('#wrapupok').click(function(){
+    event.preventDefault();
+    //show the values in wrap up form
+    var duedate = $('#duedatepicker').val();
+    console.log("Duedate is: " + duedate);
+    var subject = $('#subject').val();
+    var callresult = $('#callresult').val();
+    var priority = $('#priorities').val();
+    var status = $('#status').val();
+    var comments = $('#comments').val();
+            
+    var saveParams = 'Subject=' + subject;
+    saveParams += '&Status=' + status;                 
+    saveParams += '&Activitydate=' + duedate;
+    saveParams += '&Phone=' + localStorage.getItem('callNumber');   
+    saveParams += '&Description=' + comments;
+    saveParams += '&Priority=' + priority;
+    saveParams += '&CallDisposition=' + callresult;
+            
+    var objectId = localStorage.getItem('resultobjectid');
+
+    if(objectId.substr(0,3) == '003') {
+        saveParams += '&whoId=' + objectId;                    
     } else {
-        saveParams += '&whatId=' + result.objectId;            
+        saveParams += '&whatId=' + objectId;            
     }
+    console.log('Params to be saved in call log: ' + saveParams);
     sforce.interaction.saveLog('Task', saveParams, function(response){
      	if(response.result){
        		console.log("success in sforce.interaction.saveLog: " + response.result);
        	}else{
        		console.log("error in sforce.interaction.saveLog: " + response.error);
        	}
-    }); 
+    });
 
-    //releaseLocalStorage();      
-};
+    localStorage.removeItem('resultobjectid');
+    $('#callwrapup').css('display', 'none');
+});
+$('#wrapupcancel').click(function(){
+    event.preventDefault();
+    $('#callwrapup').css('display', 'none');
+    localStorage.removeItem('resultobjectid');
+});
+//up to here
 
 $('#call').click(function(){
 	event.preventDefault();

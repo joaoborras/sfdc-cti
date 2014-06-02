@@ -3,7 +3,6 @@
 <head>
 
 	<meta charset="utf-8">
-	<link rel="stylesheet" href="css/main.css" type="text/css" />
 	<link rel="stylesheet" href="css/jquery-ui.css" />
 	<!--link href="css/normalize.css" rel="stylesheet" type="text/css" /-->
 	<!--link href="css/bootstrap.css" rel="stylesheet" type="text/css" /-->
@@ -12,6 +11,7 @@
 	<script src="js/jquery-ui.js"></script>
 	<script src="js/jquery.base64.js"></script>
 	<script src="js/handlebars-v1.3.0.js"></script>
+	<link rel="stylesheet" href="css/main.css" type="text/css" />
 	<script src="https://c.na1.visual.force.com/support/api/30.0/interaction.js" type="text/javascript"></script>
 </head>
 <body>
@@ -61,6 +61,40 @@
 	</table>
 	<!-- end of jQuery dial-pad -->
 	<button id="show_hidedialpad" type="button">Show dialpad</button>
+	<!-- Call Wrap Up form -->
+	<div id='callwrapup'>
+	    <form id='wrapupform'>
+	        <hr><br/>
+	        <label>Subject:</label><br/>
+	        <input id='subject' type='text' value='' placeholder='log subject' size='20'></input><br/>
+	        <label>Call Result:</label><br/>
+	        <select id='callresult'><br/>
+	            <option value='Success'>Success</option>
+	            <option value='Callback'>Callback</option>
+	            <option value='Lead'>Lead</option>
+	            <option value='Fail'>Fail</option>
+	        </select><br/>
+	        <label>Priority:</label><br/>
+	        <select id='priorities'><br/>
+	            <option value='High'>High</option>
+	            <option value='Normal'>Normal</option>
+	            <option value='Low'>Low</option>
+	        </select><br/>
+	        <label>Status:</label><br/>
+	        <select id='status'>
+	            <option value='Not Started'>Not Started</option>
+	            <option value='In Progress'>In Progress</option>
+	            <option value='Completed'>Completed</option>
+	            <option value='Waiting on someone else'>Waiting someone else</option>
+	            <option value='Deferred'>Deferred</option>
+	        </select><br/>
+	        <label>Due Date:</label><br/>
+	        <input type='text' id='duedatepicker'><br/>
+	        <textarea id='comments' rows='4' cols='15'>Comments</textarea><br/>
+	        <button id='wrapupok' type='button'>Ok</buton><button id='wrapupcancel'>Cancel</button>
+	    </form>
+	</div>
+	<!-- up to here -->
 	
 	<!-- the BW credentials modal -->
 	<div id="bw_credentials">

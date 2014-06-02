@@ -14,7 +14,10 @@ sup, #show_hidedialpad{
 .digit, #delete, #call, #hold, #transfer{
     cursor:pointer;
 }
-#dialpad{
+.ui-datepicker{
+    font-size:10px;
+}
+#dialpad, #callwrapup{
     display:none;
 }
 #visor{
