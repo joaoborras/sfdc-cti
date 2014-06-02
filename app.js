@@ -69,7 +69,7 @@ if ('development' == app.get('env')) {
 //TODO: the Access-Control is not working -> have to check it
 app.all('*', function(req, res, next){
   	//res.header("Access-Control-Allow-Origin", "https://pbxltest.zendesk.com");
-  	res.header("Access-Control-Allow-Origin", "*");
+  	res.header("Access-Control-Allow-Origin", "https://ap.salesforce.com");
   	res.header("Access-Control-Allow-Headers", "X-Requested-With, Access-Control-Allow-Credentials, Authorization");
   	res.header("Access-Control-Allow-Credentials", true);
   	next();
@@ -361,8 +361,9 @@ startHeartbeat = function(){
 	};
 	var http = require('http');
 	var req = http.request(options, function(res) {
-		if(res.statusCode != 200){
+		if(res.statusCode != 200){//some problems happened with the channel. Open a new one
 			log.error("<- response from BW on heartbeat: " + res.statusCode + '\r\n');
+			requestChannel();
 		}
 	  	log.info("<- response from BW on heartbeat: " + res.statusCode + '\r\n');
 	});
@@ -479,8 +480,10 @@ parseChunk = function(chunk){ //chunk is already string
 	}else if(chunk.indexOf('ChannelTerminatedEvent') >= 0){
 		console.log("WARNING: ChannelTerminatedEvent <-");
 		bwconnection.channelId = '';
+		requestChannel();
 	}else if(chunk.indexOf('SubscriptionTerminatedEvent') >= 0){//will open a new subscription
 		console.log('WARNING: SubscriptionTerminatedEvent <-');
+		log.warning('SubscriptionTerminatedEvent <-');
 		eventSubscription('Advanced Call');
 	}else if(chunk.indexOf('<xsi:Event ') >= 0){//xsi:Event received. Now see if it is channel disconnection
 		//for every xsi:Event, needs to send event Response
