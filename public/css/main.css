@@ -4,9 +4,12 @@ td{
     color:midnightblue;
     font-weight:bold;
     max-width: 20px;
+    border: solid 1px #000;
 }
 table{
     width:100%;
+    border-collapse:collapse;
+    border: solid 1px #000;
 }
 sup, #show_hidedialpad{
     font-size:10px;
