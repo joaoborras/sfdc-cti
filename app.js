@@ -169,16 +169,23 @@ app.all("/log_out/", function(req, res){
 });
 
 app.all("/connect/", function(req, res){
-	console.log("<- /connect/ called from user " + req.param('username'));
-	log.info('<- /connect/ called from user ' + req.param('username'));
+	var username = req.param('username');
+	console.log("<- /connect/ called from user " + username);
+	log.info('<- /connect/ called from user ' + username);
 	for(var index in credentials){
-		if(credentials[index].username == req.param('username')){
-			console.log("found user " + req.param('username') + " in credentials and will now connect it");
+		if(credentials[index].username == username){
+			console.log("found user " + username + " in credentials and will now connect it");
 			credentials[index].appId = res;
+			/*var connectresponse = '<Event>';
+			connectresponse += '<eventtype>ConnectResponse</eventtype>';
+			connectresponse += '</Event>';
+			res.send(connectresponse);
+			console.log("-> ConnectResponse to SFDC(" + username + ")");
+			log.info("-> ConnectResponse to SFDC(" + username + ")");*/
 			//res.set('Text-Encoding', 'chunked');
 			//res.writeHead(200, {'Content-Type': 'text/plain'});
 		}else{
-			console.log("Username " + req.param('username') + " not in credentials");
+			console.log("Username " + username + " not in credentials");
 		}
 	}
 });

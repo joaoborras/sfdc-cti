@@ -68,7 +68,7 @@ function startHeartbeat(){
 	}, 15000);
 };
 
-function connect(username){
+function connect(username, callback){
 	var mainXhr = new XMLHttpRequest();
 	console.log('-> /connect/?username=' + username);
 	var url = '/connect/?username=' + username;
@@ -78,6 +78,9 @@ function connect(username){
 			console.log(mainXhr.responseText);
 			var eventtype = $(mainXhr.responseText).find('eventtype').text();
 			switch(eventtype){
+				case 'ConnectResponse':
+					callback();
+					break;
 				case 'HeartBeatResponse':
 					console.log('<- HeartBeatResponse');
 					break;
@@ -286,6 +289,10 @@ bwlogin = function(username, password){
 			localStorage.setItem('username', username);
 			$('#call').css('background-color', '#093');
 			localStorage.setItem('softphonestate', 'free');
+			/*connect(username, function(){
+				startHeartbeat();
+				$('#loggeduser').text(localStorage.getItem(('username')));
+			});*/
 			connect(username);
 			startHeartbeat();
 			$('#loggeduser').text(localStorage.getItem(('username')));
@@ -332,19 +339,6 @@ disconnectcall = function(callid){
 	console.log("disconnectcall called for callid: " + callid);
 	var username = localStorage.getItem("username");
 	$.ajax({url: "/disconnect_call/?username=" + username + "&callid=" + callid,
-		cache: false, 
-		success:function(result){
-			console.log("result: " + result);
-		},
-		error:function(xhr, status, result){
-			console.log("Status: " + status + "; result: " + result);
-		}
-	});
-};
-
-disconnectcall2 = function(){
-	var username = localStorage.getItem("username");
-	$.ajax({url: "/disconnect_call/?username=" + username,
 		cache: false, 
 		success:function(result){
 			console.log("result: " + result);
