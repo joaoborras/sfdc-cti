@@ -1,0 +1,107 @@
+//Requests to the proxy from here
+issignedinserver = function(username, callback){  
+	$.ajax({url: "/issignedin/?username=" + username, 
+		cache: false,
+		success:function(result){
+			callback(true);
+		},
+		error: function(xhr, status, result){
+			callback(false);
+		}
+	});
+};
+
+bwlogin = function(username, password){
+	$.ajax({url: "/log_in/?username=" + username + "&password=" + password, 
+		cache: false,
+		success:function(result){
+			$( "#credentials-modal-form" ).dialog( "close" );
+			localStorage.setItem("loggedin", true);
+			localStorage.setItem('username', username);
+			$('#call').css('background-color', '#093');
+			localStorage.setItem('softphonestate', 'free');
+			connect(username);
+			$('#loggeduser').text(localStorage.getItem(('username')));
+		},
+		error: function(xhr, status, result){
+			if(xhr.status == 404){
+				alert(xhr.status + " - " + result + ": Please verify your credentials");
+			}
+		}
+	});
+};
+
+bwlogout = function(username){
+	$.ajax({url: "/log_out/?username=" + username, 
+		cache: false,
+		success:function(result){
+			localStorage.removeItem('softphonestate');
+			localStorage.setItem("loggedin", false);
+			localStorage.removeItem('username');
+			$( "#credentials-modal-form" ).dialog( "open" );
+			$('#loggeduser').text('');			
+		},
+		error: function(xhr, status, result){
+			console.log("Status: " + status + "; result: " + result);
+		}
+	});
+};
+
+acceptcall = function(){
+	var username = localStorage.getItem("username");
+	console.log("acceptcall function called for " + username);
+	$.ajax({url: "/accept_call/?username=" + username, 
+		cache: false,
+		success:function(result){
+			console.log("result: " + result);
+		},
+		error:function(xhr, status, result){
+			console.log("Status: " + status + "; result: " + result);
+		}
+	});
+};
+
+disconnectcall = function(callid){
+	console.log("disconnectcall called for callid: " + callid);
+	var username = localStorage.getItem("username");
+	$.ajax({url: "/disconnect_call/?username=" + username + "&callid=" + callid,
+		cache: false, 
+		success:function(result){
+			console.log("result: " + result);
+		},
+		error:function(xhr, status, result){
+			console.log("Status: " + status + "; result: " + result);
+		}
+	});
+};
+
+declinecall = function(callid){
+	console.log("declinecall called for callid: " + callid);
+	var username = localStorage.getItem("username");
+	$.ajax({url: "/decline_call/?username=" + username + "&callid=" + callid, 
+		cache: false,
+		success:function(result){
+			console.log("result: " + result);
+		},
+		error:function(xhr, status, result){
+			console.log("Status: " + status + "; result: " + result);
+		}
+	});
+};
+
+makecall = function(destination){
+	var username = localStorage.getItem("username");
+	$.ajax({url: "/make_call/?username=" + username + "&destination=" + destination, 
+		cache: false,
+		success:function(result){
+			$('#number').html("Calling " + destination);
+           	localStorage.setItem('callNumber', destination);
+			localStorage.setItem('calledtype', "outbound");
+			localStorage.setItem('callLogSubject', 'Call On');
+		},
+		error:function(xhr, status, result){
+			console.log("Status: " + status + "; result: " + result);
+		}
+	});
+};
+//Until here
