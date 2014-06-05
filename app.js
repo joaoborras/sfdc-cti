@@ -501,7 +501,7 @@ parseChunk = function(chunk){ //chunk is already string
 		//TODO: for now do nothing as it is only answer from heartbeat
 	}else if(chunk.indexOf('ChannelTerminatedEvent') >= 0){
 		console.log("WARNING: ChannelTerminatedEvent <-");
-		log.warning("WARNING: ChannelTerminatedEvent <-");
+		log.warning("ChannelTerminatedEvent <-");
 		bwconnection.channelId = '';
 		requestChannel();
 	}else if(chunk.indexOf('SubscriptionTerminatedEvent') >= 0){//will open a new subscription
