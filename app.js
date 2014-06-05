@@ -28,6 +28,7 @@ var bwconnection = {
 
 //**************** global constants to be used by all ZD's apps *********************
 var HEARTBEAT_INTERVAL = 15000;
+var CHANNEL_UPDATE_INTERVAL = 1800000;
 var BW_URL = 'xsp1.pbxl.net';
 var ZD_URL = 'pbxltest.zendesk.com';
 var EVENT_CLOSE = '</xsi:Event>';
@@ -365,6 +366,46 @@ requestChannel = function(){
 	req.write(xml_data);
 	req.end();
 	log.info('-> POST ' + BW_URL + '/com.broadsoft.async/com.broadsoft.xsi-events/v2.0/channel \r\n' + xml_data + '\r\n');
+};
+
+updatedChannel = function(){
+	console.log("-> INFO: updateChannel");
+	var options = {
+		host: BW_URL,
+		path: "/com.broadsoft.xsi-events/v2.0/channel" + bwconnection.channelId,
+		method: 'PUT',
+		auth: bwconnection.groupadmin + ':' + bwconnection.groupadminpassword,
+		headers: {'Content-Type': 'text/xml'}
+	};
+	var http = require('http');
+	var req = http.request(options, function(res){
+		if(res.statusCode != 200){
+			console.log("Error in updateChannel. Response status is " + res.statusCode);
+			log.error("<- response from BW: " + res.statusCode + '\r\n');
+		}
+		res.setEncoding('utf8');
+		var resbody = "";
+		res.on('data', function (chunk) {
+			log.info("<- " + chunk + '\r\n');
+        	/*resbody += chunk;
+        	if(resbody.indexOf(CHANNEL_CLOSE) >= 0){
+				parseChunk(resbody);
+				resbody = ""; //prepares to receive a new event, if any!
+    	});*/
+	});
+
+	req.on('error', function(e) {
+  		console.log('problem with updateChannel request: ' + e.message);
+	});
+	console.log("channelSetId in requestChannel function is " + bwconnection.channelSetId);
+	var xml_data = '<?xml version="1.0" encoding="UTF-8"?>';
+		xml_data = xml_data + '<Channel xmlns="http://schema.broadsoft.com/xsi">';
+		xml_data = xml_data + '<expires>3600</expires>';
+		xml_data = xml_data + '</Channel>';
+
+	req.write(xml_data);
+	req.end();
+	log.info('-> POST ' + BW_URL + '/com.broadsoft.xsi-events/v2.0/channel' + bwconnection.channelId + '\r\n' + xml_data + '\r\n');
 };
 
 startHeartbeat = function(){
