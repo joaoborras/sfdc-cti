@@ -68,7 +68,8 @@ if ('development' == app.get('env')) {
 //TODO: the Access-Control is not working -> have to check it
 app.all('*', function(req, res, next){
   	//res.header("Access-Control-Allow-Origin", "https://pbxltest.zendesk.com");
-  	res.header("Access-Control-Allow-Origin", "https://ap.salesforce.com");
+  	//res.header("Access-Control-Allow-Origin", "https://ap.salesforce.com");
+  	res.header("Access-Control-Allow-Origin", "*");
   	res.header("Access-Control-Allow-Headers", "X-Requested-With, Access-Control-Allow-Credentials, Authorization");
   	res.header("Access-Control-Allow-Credentials", true);
   	next();
@@ -342,6 +343,10 @@ requestChannel = function(){
 			console.log("Will try again...");
 			requestChannel();
 		});
+		res.on('close', function(e){
+			console.log("ERROR: Main connection closed.");
+			log.error("Main connection closed.");
+		});
 	});
 
 	req.on('error', function(e) {
@@ -363,37 +368,42 @@ requestChannel = function(){
 };
 
 startHeartbeat = function(){
-	console.log("-> INFO: startHeartbeat");
-	var options = {
-	  host: BW_URL,
-	  path: '/com.broadsoft.xsi-events/v2.0/channel/' + bwconnection.channelId + "/heartbeat",
-	  method: 'PUT',
-	  auth: bwconnection.groupadmin + ':' + bwconnection.groupadminpassword,
-	};
-	var http = require('http');
-	var req = http.request(options, function(res) {
-		if(res.statusCode != 200){//some problems happened with the channel. Open a new one
-			log.error("<- response from BW on heartbeat: " + res.statusCode + '\r\n');
-			requestChannel();
-		}
-	  	log.info("<- response from BW on heartbeat: " + res.statusCode + '\r\n');
-	});
+	if(bwconnection.channelId != ''){
+		console.log("-> INFO: startHeartbeat");
+		var options = {
+		  host: BW_URL,
+		  path: '/com.broadsoft.xsi-events/v2.0/channel/' + bwconnection.channelId + "/heartbeat",
+		  method: 'PUT',
+		  auth: bwconnection.groupadmin + ':' + bwconnection.groupadminpassword,
+		};
+		var http = require('http');
+		var req = http.request(options, function(res) {
+			if(res.statusCode != 200){//some problems happened with the channel. Open a new one
+				log.error("<- response from BW on heartbeat: " + res.statusCode + '\r\n');
+				requestChannel();
+			}
+		  	log.info("<- response from BW on heartbeat: " + res.statusCode + '\r\n');
+		});
 
-	req.on('error', function(e) {
-  		console.log('problem with heartbeat request: ' + e.message);
-	});
+		req.on('error', function(e) {
+	  		console.log('problem with heartbeat request: ' + e.message);
+		});
 
-	req.end();
-	log.info('-> PUT ' + BW_URL + '/com.broadsoft.xsi-events/v2.0/channel/' + bwconnection.channelId + "/heartbeat \r\n");
+		req.end();
+		log.info('-> PUT ' + BW_URL + '/com.broadsoft.xsi-events/v2.0/channel/' + bwconnection.channelId + "/heartbeat \r\n");
+	}else{
+		console.log("WARNING: now heartbeat sent as there is no channel openned");
+		log.warning("WARNING: now heartbeat sent as there is no channel openned");
+	}
 
-	heartbeatIntervalId = setTimeout(function(){
+	/*heartbeatIntervalId = setTimeout(function(){
 		if(bwconnection.channelId != ''){
 			startHeartbeat();
 		}else{
 			//if there is no channel, then start again from requesting a new one
 			requestChannel();
 		}
-	}, HEARTBEAT_INTERVAL);
+	}, HEARTBEAT_INTERVAL);*/
 };
 
 //need to make a subscription for each user registered
@@ -482,7 +492,8 @@ parseChunk = function(chunk){ //chunk is already string
 		parseString(chunk, function(err, result){
 			bwconnection.channelId = result.Channel.channelId;
 			//start heartbeat
-			startHeartbeat();
+			var heartbeatintervalid = setInterval(startHeartbeat, HEARTBEAT_INTERVAL);
+			//startHeartbeat();
 			//channel events subscription
 			eventSubscription('Advanced Call');
 		});
@@ -490,12 +501,13 @@ parseChunk = function(chunk){ //chunk is already string
 		//TODO: for now do nothing as it is only answer from heartbeat
 	}else if(chunk.indexOf('ChannelTerminatedEvent') >= 0){
 		console.log("WARNING: ChannelTerminatedEvent <-");
+		log.warning("WARNING: ChannelTerminatedEvent <-");
 		bwconnection.channelId = '';
 		requestChannel();
 	}else if(chunk.indexOf('SubscriptionTerminatedEvent') >= 0){//will open a new subscription
 		console.log('WARNING: SubscriptionTerminatedEvent <-');
 		log.warning('SubscriptionTerminatedEvent <-');
-		eventSubscription('Advanced Call');
+		//eventSubscription('Advanced Call');
 	}else if(chunk.indexOf('<xsi:Event ') >= 0){//xsi:Event received. Now see if it is channel disconnection
 		//for every xsi:Event, needs to send event Response
 		try{

@@ -14,6 +14,9 @@
 <body>
 	<!-- jQuery dial-pad -->
 	<table>
+		<tr>
+	        <td id="title" colspan=3><img src="images/logo.png" alt="PBXL" width="55px"></td>
+	    </tr>
 	    <tr>
 	        <td id='visor' colspan=3>
 	            <sup>User:<span id='loggeduser'></span></sup>
@@ -45,17 +48,19 @@
 	        </tr>
 	    </table>
 	</div>
+	<div id="buttons">
 	<table>
 	    <tr>
-	        <td id='clear'>Clear</td>
-	        <td id='delete'>Delete</td>
-	        <td id='call' class="pulse">Call</td>
+	        <td id='clear'><img src="images/clear.png" width="15" alt="clear"></td>
+	        <td id='delete'><img src="images/delete.png" width="17" alt="delete"></td>
+	        <td id='call' class='pulse'><img src="images/call.png" width="18" alt="call"></td>
 	    </tr>
 	    <tr>
-	        <td id='hold'>Hold</td>
-	        <td id='transfer'>Transfer</td>
+	        <td id='hold'><img src="images/hold.png" width="22" alt="hold"></td>
+	        <td id='transfer'><img src="images/transfer.png" width="30" alt="transfer"></td>
 	    </tr>
 	</table>
+    </div>
 	<!-- end of jQuery dial-pad -->
 	<button id="show_hidedialpad" type="button">Show dialpad</button>
 	<!-- Call Wrap Up form -->
@@ -105,8 +110,36 @@
 			</fieldset>
 		</form>
 	</div>
+	<!-- until here the BW credentials modal -->
 
-	<div id='userdirectory'></div>
+	<!-- the Call Transfer modal form -->
+	<div>
+		<form id='calltransfer-modal-form'>
+			<fieldset>
+				<div id='userdir'></div>
+			</fieldset>
+		</form>
+	</div>
+	<!-- until here the Call Transfer modal form -->
+
+	<div id="dialog_mainhttp_disconnection" title="Disconnected from the server!">
+  		<p>
+  			<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>Lost connection with the server. Please wait until the connection is recovered.
+  		</p>
+	</div>
+
+	<!--this is the handlebars template that will receive directory info -->
+	<script id="directory-entry-template" type="text/x-handlebars-template">
+		<div class="entry">
+			<input id='extensioninput' list="extensions" name="extension" autocomplete="off" placeholder='choose extension'>
+				<datalist id='extensions' class='userdirectory'>
+				{{#each users}}
+					<option class='dirextension' value= "{{this.extension}}">{this.lastname}} {{this.firstname}}</option>
+				{{/each}}
+				</datalist>
+		</div>
+	</script>
+	<!--until here handlebars template -->
 
 	<!-- script src="js/main.js"></script -->
 	<script src="js/softphone_control.js"></script>

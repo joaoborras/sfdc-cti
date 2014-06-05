@@ -34,8 +34,8 @@ function connect(username){
 	};
 	mainXhr.onloadend = function() {
 		console.log('Main HTTP session closed! Will connect again in 5 secs...');
-		alert('Main HTTP session closed! Will connect again in 5 secs...');
 		//Will try to connect again until it gets a connection
+		//$("#dialog_mainhttp_disconnection").dialog("open");
 		setTimeout(function(){
 			connect(localStorage.getItem('username'));
 		}, 5000);
@@ -48,6 +48,7 @@ processchunk = function(chunk){
 	switch(eventtype){
 		case 'ConnectResponse':
 			console.log('<- ConnectResponse');
+			//$("#dialog_mainhttp_disconnection").dialog("close");
 			startHeartbeat();
 			break;
 		case 'HeartBeatResponse':
@@ -105,6 +106,12 @@ processchunk = function(chunk){
 				//change background color of "call" icon to #0c3(green)
 				$('#call').css('background-color', '#093');
 				sforce.interaction.getPageInfo(saveCallLog); //save call log in SFDC
+			}
+			break;
+		case 'CallRedirectedEvent':
+			if(localStorage.getItem('calltransfermodal') == 'open'){
+				$( "#calltransfer-modal-form" ).dialog( "close" );
+				localStorage.removeItem('calltransfermodal');
 			}
 			break;
 		default:

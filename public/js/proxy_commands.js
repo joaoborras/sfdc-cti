@@ -104,4 +104,52 @@ makecall = function(destination){
 		}
 	});
 };
+
+transferCall = function(){
+	console.log('transfer call button clicked...');
+	var destination = $('#extensioninput').val();
+	console.log("Destination: " + destination);
+	var username = localStorage.getItem("username");
+	$.ajax({url: "/transfer_call/?username=" + username + "&destination=" + destination, 
+		cache: false,
+		success:function(result){
+			
+		},
+		error:function(xhr, status, result){
+			console.log("Status: " + status + "; result: " + result);
+		}
+	});
+};
+
+getUserDir = function(){
+	var source = $('#directory-entry-template').html();
+	var template = Handlebars.compile(source);
+	var html;
+	var username = localStorage.getItem('username');
+	$.ajax({url: "/get_directoryforuser/?username=" + username, 
+		success:function(result){;
+			var directory = {users: []};
+			var parser = new DOMParser();
+			var xmldoc = parser.parseFromString(result, "text/xml");
+			var totalusers = xmldoc.getElementsByTagName('numberOfRecords').item(0).firstChild.nodeValue;
+			var extension;
+			for(var x=0; x<totalusers;x++){
+				if(xmldoc.getElementsByTagName('extension').item(x)){
+					extension = xmldoc.getElementsByTagName('extension').item(x).firstChild.nodeValue;
+				}else{
+					extension = '';
+				}
+				directory.users.push({
+					firstname: xmldoc.getElementsByTagName('firstName').item(x).firstChild.nodeValue,
+					lastname: xmldoc.getElementsByTagName('lastName').item(x).firstChild.nodeValue,
+					extension: extension,
+				});
+			}
+			html = template(directory);
+			$('#userdir').html(html);
+			$( "#calltransfer-modal-form" ).dialog( "open" );
+			localStorage.setItem('calltransfermodal', 'open');
+		},
+	});
+};
 //Until here

@@ -1,38 +1,108 @@
+/* header */
 td{
-    padding:10px;
-    background-color:darkorange;
-    color:midnightblue;
-    font-weight:bold;
-    max-width: 20px;
-    border: solid 1px #000;
+  padding:10px;
+  font-weight:bold;
+  max-width: 20px;
+  text-align: center;
 }
+
 table{
-    width:100%;
-    border-collapse:collapse;
-    border: solid 1px #000;
+  width:100%;
+	border-collapse: collapse;
 }
-sup, #show_hidedialpad{
+
+#title {
+    padding:5px 0 0 0;
+background:#fff;
+    border-radius: 5px 5px 0 0;
+-ms-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+}
+
+#visor{
+	background:#ced4db;
+    border-radius: 0;
+	-ms-border-radius: 0;
+ 	-moz-border-radius: 0;
+ 	-webkit-border-radius: 0;
+    text-align: left;
+	height:20px;
+	border-top:3px solid #bcc3cd;
+	color:#393939;
+}
+
+
+#visor p{
+	line-height:100%;
+	margin:0 5px;
+	font-size:12px;
+}
+
+#visor sup{
+    font-size:10px;
+margin-left:3px;
+line-height:100%;
+}
+
+
+/* dialpad */
+#dialpad{
+  display:none;
+	background:#fff;
+}
+
+#dialpad table{
+	background: none repeat scroll 0 0 #FFF;
+  border-spacing: 10px;
+	border-collapse:separate;
+   width: 100%;
+}
+#dialpad td{
+	background-color: #56bcdc;
+   border-radius: 100%;
+	-ms-border-radius: 100%;
+ 	-moz-border-radius: 100%;
+ 	-webkit-border-radius: 100%;
+    font-weight: bold;
+    max-width: 20px;
+    padding: 10px;
+	color:#fff;
+}
+
+sup, #show_hidedialpad, .userdirectory{
     font-size:10px;
 }
+
+/* buttons */
+#buttons table{
+    border-spacing: 3px;
+	border-collapse:separate;
+}
+#buttons td{
+    color:#FFF;
+    border-radius: 5px;
+	-ms-border-radius: 5px;
+ 	-moz-border-radius: 5px;
+ 	-webkit-border-radius: 5px;
+}
+
+#buttons td img{
+	vertical-align:middle;
+}
+
 .digit, #delete, #call, #hold, #transfer{
     cursor:pointer;
 }
-.ui-datepicker{
-    font-size:10px;
+#call {
+    background:#f08229;
 }
-#dialpad, #callwrapup{
-    display:none;
-}
-#visor{
-    height:50px;
-    background:#B8B8B8;
+#clear, #delete {
+    background:#4e5660;
 }
 #number{
     font-size:15px;
     height:20px;
-}
-#call{
-    background: olivedrab;
 }
 #extras{
     float:right;
@@ -51,4 +121,23 @@ a#credentials, a#signout{
 }
 #username, #password,#label_username, #label_password{
 	font-size: 10px;
+}
+/*Datepicker for the wrap up form*/
+.ui-datepicker{
+    font-size:10px;
+}
+#callwrapup{
+    display:none;
+}
+/*modal forms: sign in and call transfer*/
+.ui-dialog-content, .ui-dialog-titlebar{
+    font-size: 10px;
+}
+fieldset {
+    padding:0; 
+    border:0; 
+    margin-top:25px; 
+}
+.ui-dialog-buttonpane{
+    font-size: 10px;
 }

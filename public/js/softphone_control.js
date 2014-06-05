@@ -66,11 +66,21 @@ $('#show_hidedialpad').click(function(){
     }
 });
 
+//modal dialog for when the main streaming HTTP connection is lost
+$("#dialog_mainhttp_disconnection").dialog({
+    autoOpen: false,
+    resizable: false,
+    height:140,
+    width: 250,
+    modal: true
+});
+//end of modal dialog for when the main streaming HTTP connection is lost
+
 //Sign In modal form
 $( "#credentials-modal-form" ).dialog({
     autoOpen: false,
     modal: true,
-    width: 250,
+    width: 180,
     resizable: false,
     title: "BW Credentials",
     buttons: [
@@ -79,18 +89,48 @@ $( "#credentials-modal-form" ).dialog({
             click: function(){
                 bwlogin($('#username').val(), $('#password').val());
             },
-            style: "font-size:10px;position:relative;left:-90px",
+            //style: "font-size:10px;position:relative;left:-90px",
+            style: "position: relative; left: -20%",
         },
         {
             text: "Cancel",
             click: function(){
                 $( "#credentials-modal-form" ).dialog( "close" );
             },
-            style: "font-size:10px;position:relative;left:0px",
+            //style: "font-size:10px;position:relative;left:0px",
+            style: "position: relative; right: -10%",
         }
     ]
 }); 
 //End of Sign In modal form
+
+//Call Transfer modal form
+$( "#calltransfer-modal-form" ).dialog({
+    autoOpen: false,
+    modal: true,
+    width: 150,
+    height: 250,
+    resizable: false,
+    title: "Extensions",
+    buttons: [
+        {
+            text: "Transfer",
+            click: function(){
+                transferCall();
+            },
+            style: "position: relative; left: 0%",
+        },
+        {
+            text: "Cancel",
+            click: function(){
+                $( "#calltransfer-modal-form" ).dialog( "close" );
+            },
+            style: "position: relative; right: -10%",
+        }
+    ]
+});
+
+//until here Call Transfer modal form
 
 //Sign out process will delete all localStorage variables and sign out the proxy
 $('#signout').click(function(){
@@ -160,6 +200,11 @@ $('#call').click(function(){
             break;
         default:
     } 
+});
+
+$('#transfer').click(function(){
+    event.preventDefault();
+    getUserDir();
 });
 
 $('#declinecall').click(function(){
