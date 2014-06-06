@@ -17,8 +17,10 @@ var bwconnection = {
 	applicationId: 'broadsoft4sfdc',
 	channelSetId: 'broadsoft4sfdcchannelset',
 	channelId: '',
-	heartbeatIntervalId: '', //TODO: this variable is global as there is only 1 streaming http
+	heartbeatIntervalId: '',
+	channelUpdateIntervalId: '',
 	subscriptionId: '',
+	subscriptionUpdateIntervalId: '',
 	callhalf: '',
 	groupadmin: 'jp_zentest@pbxl.net',
 	groupadminpassword: 'Borras123',
@@ -29,8 +31,10 @@ var bwconnection = {
 //**************** global constants to be used by all ZD's apps *********************
 var HEARTBEAT_INTERVAL = 15000;
 var CHANNEL_UPDATE_INTERVAL = 1800000;
+var SUBSCRIPTION_UPDATE_INTERVAL = 1600000;
 var BW_URL = 'xsp1.pbxl.net';
 var ZD_URL = 'pbxltest.zendesk.com';
+var SUBSCRIPTION_CLOSE = '</Subscription>';
 var EVENT_CLOSE = '</xsi:Event>';
 var CHANNEL_CLOSE = '</Channel>';
 var HEARTBEAT_CLOSE = '<ChannelHeartBeat xmlns="http://schema.broadsoft.com/xsi"/>';
@@ -240,6 +244,24 @@ app.all('/transfer_call/', function(req, res){
 	transferCall(req.param('username'), req.param('destination')); //TODO: implement rejectCall();
 });
 
+app.all('/hold_call/', function(req, res){
+	console.log("/hold_call/ received" + req.query);
+	log.info('<- /hold_call/ from: ' + req.param('username'));
+	res.writeHead(200, {'Content-Type': 'text/plain'});
+	res.send();
+	holdCall(req.param('username'), req.param('callid')); //TODO: implement rejectCall();
+});
+
+app.all('/retrieve_call/', function(req, res){
+	console.log("/retrieve_call/ received" + req.query);
+	log.info('<- /retrieve_call/ from: ' + req.param('username'));
+	res.writeHead(200, {'Content-Type': 'text/plain'});
+	res.send();
+	retrieveCall(req.param('username'), req.param('callid')); //TODO: implement rejectCall();
+});
+
+
+
 //********************** event processing work functions *************************
 verifyUser = function(username, password, callback){
 	console.log("INFO: verifyUser -> " + username);
@@ -319,19 +341,22 @@ requestChannel = function(){
 		headers: {'Content-Type': 'text/xml'}
 	};
 	var req = http.request(options, function(res){
-		if(res.statusCode != 200){
+		if(res.statusCode != 200 && res.statusCode != 401 && res.statusCode != 403){//not auth problem
 			console.log("Error in requestChannel. Response status is " + res.statusCode);
-			console.log("Will try again...");
 			log.error("<- response from BW: " + res.statusCode + '\r\n');
-			log.info("Will try again...");
-			requestChannel();
+			console.log("Will try again in 5 secs...");
+			log.info("Will try again in 5 secs...");
+			setTimeout(function(){
+				requestChannel();
+			},5000);
 		}
 		res.setEncoding('utf8');
 		var resbody = "";
 		res.on('data', function (chunk) {
 			log.info("<- " + chunk + '\r\n');
         	resbody += chunk;
-        	if(resbody.indexOf(EVENT_CLOSE) >= 0 || resbody.indexOf(CHANNEL_CLOSE) >= 0 || resbody.indexOf(HEARTBEAT_CLOSE) >= 0){
+        	if(resbody.indexOf(EVENT_CLOSE) >= 0 || resbody.indexOf(CHANNEL_CLOSE) >= 0 || 
+        		resbody.indexOf(HEARTBEAT_CLOSE) >= 0 || resbody.indexOf(SUBSCRIPTION_CLOSE) >= 0){
 				parseChunk(resbody);
 				resbody = ""; //prepares to receive a new event, if any!
 			}else if(resbody.indexOf('<ChannelHeartBeat ') >= 0){
@@ -368,11 +393,12 @@ requestChannel = function(){
 	log.info('-> POST ' + BW_URL + '/com.broadsoft.async/com.broadsoft.xsi-events/v2.0/channel \r\n' + xml_data + '\r\n');
 };
 
-updatedChannel = function(){
-	console.log("-> INFO: updateChannel");
+updateChannel = function(){
+	console.log("-> INFO: updateChannel ID " + bwconnection.channelId);
+	log.info("-> updateChannel ID " + bwconnection.channelId);
 	var options = {
 		host: BW_URL,
-		path: "/com.broadsoft.xsi-events/v2.0/channel" + bwconnection.channelId,
+		path: "/com.broadsoft.xsi-events/v2.0/channel/" + bwconnection.channelId,
 		method: 'PUT',
 		auth: bwconnection.groupadmin + ':' + bwconnection.groupadminpassword,
 		headers: {'Content-Type': 'text/xml'}
@@ -383,29 +409,19 @@ updatedChannel = function(){
 			console.log("Error in updateChannel. Response status is " + res.statusCode);
 			log.error("<- response from BW: " + res.statusCode + '\r\n');
 		}
-		res.setEncoding('utf8');
-		var resbody = "";
-		res.on('data', function (chunk) {
-			log.info("<- " + chunk + '\r\n');
-        	/*resbody += chunk;
-        	if(resbody.indexOf(CHANNEL_CLOSE) >= 0){
-				parseChunk(resbody);
-				resbody = ""; //prepares to receive a new event, if any!
-    	});*/
 	});
-
 	req.on('error', function(e) {
   		console.log('problem with updateChannel request: ' + e.message);
 	});
 	console.log("channelSetId in requestChannel function is " + bwconnection.channelSetId);
 	var xml_data = '<?xml version="1.0" encoding="UTF-8"?>';
 		xml_data = xml_data + '<Channel xmlns="http://schema.broadsoft.com/xsi">';
-		xml_data = xml_data + '<expires>3600</expires>';
+		xml_data = xml_data + '<expires>3800</expires>';
 		xml_data = xml_data + '</Channel>';
 
 	req.write(xml_data);
 	req.end();
-	log.info('-> POST ' + BW_URL + '/com.broadsoft.xsi-events/v2.0/channel' + bwconnection.channelId + '\r\n' + xml_data + '\r\n');
+	log.info('-> POST ' + BW_URL + '/com.broadsoft.xsi-events/v2.0/channel/' + bwconnection.channelId + '\r\n' + xml_data + '\r\n');
 };
 
 startHeartbeat = function(){
@@ -436,15 +452,6 @@ startHeartbeat = function(){
 		console.log("WARNING: now heartbeat sent as there is no channel openned");
 		log.warning("WARNING: now heartbeat sent as there is no channel openned");
 	}
-
-	/*heartbeatIntervalId = setTimeout(function(){
-		if(bwconnection.channelId != ''){
-			startHeartbeat();
-		}else{
-			//if there is no channel, then start again from requesting a new one
-			requestChannel();
-		}
-	}, HEARTBEAT_INTERVAL);*/
 };
 
 //need to make a subscription for each user registered
@@ -461,18 +468,18 @@ eventSubscription = function(event){
 	var http = require('http');
 	var req = http.request(options, function(res){
 		if(res.statusCode != 200){
-			console.log("<- Subscription response from BW: " + res.statusCode);
+			console.log("ERROR: <- Subscription response from BW: " + res.statusCode);
 			log.error("<- Subscription response from BW: " + res.statusCode);
-		}
-		res.setEncoding('utf8');
-		var resbody = "";
-		res.on('data', function (chunk) {
-			log.info('<- ' + chunk + '\r\n');
-    	});
-		res.on('end',function(){
-			//TODO
-		});
-
+		}else{
+			res.setEncoding('utf8');
+			res.on('data', function(response){
+				console.log("<- Subscription Response: " + response + '\r\n');
+				log.info("<- Subscription Response: " + response + '\r\n');
+				var xmldoc = new DOMParser().parseFromString(response,'text/xml');	
+				bwconnection.subscriptionId = xmldoc.getElementsByTagName('subscriptionId').item(0).firstChild.nodeValue;	
+				bwconnection.subscriptionUpdateIntervalId = setInterval(updateSubscription, SUBSCRIPTION_UPDATE_INTERVAL);
+			})
+		}		
 	});
 
 	req.on('error', function(e) {
@@ -491,6 +498,38 @@ eventSubscription = function(event){
 	req.write(xml_data);
 	req.end();
 	log.info('-> POST ' + BW_URL + "/com.broadsoft.xsi-events/v2.0/serviceprovider/" + bwconnection.serviceprovider + "/group/" + bwconnection.groupId + '\r\n' + xml_data + '\r\n');
+};
+
+updateSubscription = function(){
+	console.log("-> INFO: updateSubscription ID " + bwconnection.subscriptionId);
+	log.info("-> updateSubscription ID " + bwconnection.subscriptionId);
+	var options = {
+		host: BW_URL,
+		path: "/com.broadsoft.xsi-events/v2.0/subscription/" + bwconnection.subscriptionId ,
+		method: 'PUT',
+		auth: bwconnection.groupadmin + ':' + bwconnection.groupadminpassword,
+		headers: {'Content-Type': 'text/xml'}
+	};
+	var http = require('http');
+	var req = http.request(options, function(res){
+		if(res.statusCode != 200){
+			console.log("<- Subscription Update response from BW: " + res.statusCode);
+			log.error("<- Subscription Update response from BW: " + res.statusCode);
+		}
+	});
+
+	req.on('error', function(e) {
+  		console.log('problem with request: ' + e.message);
+	});
+
+	var xml_data = '<?xml version="1.0" encoding="UTF-8"?>';
+	xml_data = xml_data + '<Subscription xmlns=\"http://schema.broadsoft.com/xsi\">';
+	xml_data = xml_data + "<expires>3800</expires>";
+	xml_data = xml_data + "</Subscription>";
+
+	req.write(xml_data);
+	req.end();
+	log.info('-> POST ' + BW_URL + "/com.broadsoft.xsi-events/v2.0/subscription/" + bwconnection.subscriptionId + '\r\n' + xml_data + '\r\n');
 };
 
 sendResponseEvent = function(eventId){
@@ -533,10 +572,12 @@ parseChunk = function(chunk){ //chunk is already string
 		parseString(chunk, function(err, result){
 			bwconnection.channelId = result.Channel.channelId;
 			//start heartbeat
-			var heartbeatintervalid = setInterval(startHeartbeat, HEARTBEAT_INTERVAL);
+			bwconnection.heartbeatIntervalId = setInterval(startHeartbeat, HEARTBEAT_INTERVAL);
 			//startHeartbeat();
 			//channel events subscription
 			eventSubscription('Advanced Call');
+			//set interval for channel update
+			bwconnection.channelUpdateIntervalId = setInterval(updateChannel, CHANNEL_UPDATE_INTERVAL);
 		});
 	}else if(chunk.indexOf('<ChannelHeartBeat ') >= 0){
 		//TODO: for now do nothing as it is only answer from heartbeat
@@ -548,6 +589,7 @@ parseChunk = function(chunk){ //chunk is already string
 	}else if(chunk.indexOf('SubscriptionTerminatedEvent') >= 0){//will open a new subscription
 		console.log('WARNING: SubscriptionTerminatedEvent <-');
 		log.warning('SubscriptionTerminatedEvent <-');
+		bwconnection.subscriptionId = '';
 		//eventSubscription('Advanced Call');
 	}else if(chunk.indexOf('<xsi:Event ') >= 0){//xsi:Event received. Now see if it is channel disconnection
 		//for every xsi:Event, needs to send event Response
@@ -591,9 +633,15 @@ parseChunk = function(chunk){ //chunk is already string
 						incomingcallXml += '<callerid>' + remoteparty + '</callerid>';
 						incomingcallXml += '<callid>' + callid + '</callid>';
 						incomingcallXml += '</Event>';
-						responseobj.write(incomingcallXml);
-						console.log("INFO: CallReceivedEvent -> SFDC");
-						log.info("CallReceivedEvent -> SFDC(" + targetid + ")");
+						try{
+							responseobj.write(incomingcallXml);
+							console.log("INFO: CallReceivedEvent -> SFDC");
+							log.info("CallReceivedEvent -> SFDC(" + targetid + ")");
+						}catch(error)
+						{
+							console.log("ERROR: Cannot send CallReceivedEvent -> SFDC(no http session)");
+							log.info("ERROR: Cannot send CallReceivedEvent -> SFDC(no http session)");
+						}
 						break;
 					}
 				}
@@ -611,9 +659,15 @@ parseChunk = function(chunk){ //chunk is already string
 						outgoingcallXml += '<callingid>' + remoteparty + '</callingid>';
 						outgoingcallXml += '<callid>' + callid + '</callid>';
 						outgoingcallXml += '</Event>';
-						responseobj.write(outgoingcallXml);
-						log.info("CallOriginatedEvent -> SFDC(" + targetid + ")");
-						console.log("INFO: CallOriginatedEvent -> SFDC");
+						try{
+							responseobj.write(outgoingcallXml);
+							log.info("CallOriginatedEvent -> SFDC(" + targetid + ")");
+							console.log("INFO: CallOriginatedEvent -> SFDC");
+						}catch(error)
+						{
+							console.log("ERROR: Cannot send CallOriginatedEvent -> SFDC(no http session)");
+							log.info("ERROR: Cannot send CallOriginatedEvent -> SFDC(no http session)");
+						}
 						break;
 					}
 				}
@@ -634,13 +688,19 @@ parseChunk = function(chunk){ //chunk is already string
 					if(credentials[index].username === targetid){
 						//credentials[index].callhalf = xmldoc.getElementsByTagName('xsi:callId').item(0).firstChild.nodeValue;
 						var responseobj = credentials[index].appId;
-						var incomingcallXml = '<Event>';
-						incomingcallXml += '<eventtype>CallAnsweredEvent</eventtype>';
-						incomingcallXml += '<callerid>' + remoteparty + '</callerid>';
-						incomingcallXml += '</Event>';
-						responseobj.write(incomingcallXml);
-						log.info("CallAnswered -> SFDC(" + targetid + ")");
-						console.log("INFO: CallAnswered -> SFDC");
+						var answeredcallXml = '<Event>';
+						answeredcallXml += '<eventtype>CallAnsweredEvent</eventtype>';
+						answeredcallXml += '<callerid>' + remoteparty + '</callerid>';
+						answeredcallXml += '</Event>';
+						try{
+							responseobj.write(answeredcallXml);
+							log.info("CallAnsweredEvent -> SFDC(" + targetid + ")");
+							console.log("INFO: CallAnsweredEvent -> SFDC");
+						}catch(error)
+						{
+							console.log("ERROR: Cannot send CallAnsweredEvent -> SFDC(no http session)");
+							log.info("ERROR: Cannot send CallAnsweredEvent -> SFDC(no http session)");
+						}
 						break;
 					}
 				}
@@ -651,13 +711,19 @@ parseChunk = function(chunk){ //chunk is already string
 					if(credentials[index].username === targetid){
 						var callid = xmldoc.getElementsByTagName('xsi:callId').item(0).firstChild.nodeValue;
 						var responseobj = credentials[index].appId;
-						var incomingcallXml = '<Event>';
-						incomingcallXml += '<eventtype>CallReleasedEvent</eventtype>';
-						incomingcallXml += '<callid>' + callid + '</callid>';
-						incomingcallXml += '</Event>';
-						responseobj.write(incomingcallXml);
-						log.info("CallReleasedEvent -> SFDC(" + targetid + ")");
-						console.log("-> INFO: CallReleasedEvent");
+						var callreleasedXml = '<Event>';
+						callreleasedXml += '<eventtype>CallReleasedEvent</eventtype>';
+						callreleasedXml += '<callid>' + callid + '</callid>';
+						callreleasedXml += '</Event>';
+						try{
+							responseobj.write(callreleasedXml);
+							log.info("CallReleasedEvent -> SFDC(" + targetid + ")");
+							console.log("INFO: CallReleasedEvent -> SFDC");
+						}catch(error)
+						{
+							console.log("ERROR: Cannot send CallReleasedEvent -> SFDC(no http session)");
+							log.info("ERROR: Cannot send CallReleasedEvent -> SFDC(no http session)");
+						}
 						break;
 					}
 				}
@@ -670,7 +736,15 @@ parseChunk = function(chunk){ //chunk is already string
 						var callheldXml = '<Event>';
 						callheldXml += '<eventtype>CallHeldEvent</eventtype>';
 						callheldXml += '</Event>';
-						responseobj.write(callheldXml);
+						try{
+							responseobj.write(callheldXml);
+							log.info("CallHeldEvent -> SFDC(" + targetid + ")");
+							console.log("INFO: CallHeldEvent -> SFDC");
+						}catch(error)
+						{
+							console.log("ERROR: Cannot send CallHeldEvent -> SFDC(no http session)");
+							log.info("ERROR: Cannot send CallHeldEvent -> SFDC(no http session)");
+						}
 						break;
 					}
 				}
@@ -683,7 +757,36 @@ parseChunk = function(chunk){ //chunk is already string
 						var callredirectedXml = '<Event>';
 						callredirectedXml += '<eventtype>CallRedirectedEvent</eventtype>';
 						callredirectedXml += '</Event>';
-						responseobj.write(callredirectedXml);
+						try{
+							responseobj.write(callredirectedXml);
+							log.info("CallRedirectedEvent -> SFDC(" + targetid + ")");
+							console.log("INFO: CallRedirectedEvent -> SFDC");
+						}catch(error)
+						{
+							console.log("ERROR: Cannot send CallRedirectedEvent -> SFDC(no http session)");
+							log.info("ERROR: Cannot send CallRedirectedEvent -> SFDC(no http session)");
+						}
+						break;
+					}
+				}
+				break;
+			case 'CallRetrievedEvent':
+				console.log('<- INFO: CallRetrievedEvent');
+				for(var index in credentials){
+					if(credentials[index].username === targetid){
+						var responseobj = credentials[index].appId;
+						var callredirectedXml = '<Event>';
+						callredirectedXml += '<eventtype>CallRetrievedEvent</eventtype>';
+						callredirectedXml += '</Event>';
+						try{
+							responseobj.write(callredirectedXml);
+							log.info("CallRetrievedEvent -> SFDC(" + targetid + ")");
+							console.log("INFO: CallRetrievedEvent -> SFDC");
+						}catch(error)
+						{
+							console.log("ERROR: Cannot send CallRetrievedEvent -> SFDC(no http session)");
+							log.info("ERROR: Cannot send CallRetrievedEvent -> SFDC(no http session)");
+						}
 						break;
 					}
 				}
@@ -700,7 +803,6 @@ parseChunk = function(chunk){ //chunk is already string
 			case 'DoNotDisturbEvent':
 			case 'CallForwardingAlwaysEvent':
 			case 'RemoteOfficeEvent':
-			case 'CallRetrievedEvent':
 				break;
 			default:
 		}
@@ -831,11 +933,9 @@ transferCall = function(username, destination){
 declineCall = function(username, callid){
 	console.log("-> declineCall");
 	console.log("username is: " + username);
-	var callhalf;
 	var password;
 	for(var i in credentials){
 		if(credentials[i].username === username){
-			callhalf = credentials[i].callhalf;
 			password = credentials[i].password;
 		}
 	}
@@ -858,6 +958,64 @@ declineCall = function(username, callid){
 
 	req.end();
 	log.info('-> DELETE ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callid + "/?decline=true" + '\r\n');
+};
+
+holdCall = function(username, callid){
+	console.log("-> HoldCall");
+	var password;
+	for(var i in credentials){
+		if(credentials[i].username === username){
+			password = credentials[i].password;
+		}
+	}
+	var options = {
+	  host: BW_URL,
+	  path: "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callid + "/Hold",
+	  method: 'PUT',
+	  auth: username + ":" + password
+	};
+	var http = require('http');
+	var req = http.request(options, function(res) {
+	  if(res.statusCode != 200){
+			log.error("<- response from BW: " + res.statusCode + '\r\n');
+		}
+	});
+
+	req.on('error', function(e) {
+  		log.info('problem with call Hold PUT: ' + e.message + '\r\n');
+	});
+
+	req.end();
+	log.info('-> PUT ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callid + "/Hold" + '\r\n');
+};
+
+retrieveCall = function(username, callid){
+	console.log("-> ReconnectCall");
+	var password;
+	for(var i in credentials){
+		if(credentials[i].username === username){
+			password = credentials[i].password;
+		}
+	}
+	var options = {
+	  host: BW_URL,
+	  path: "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callid + "/Reconnect",
+	  method: 'PUT',
+	  auth: username + ":" + password
+	};
+	var http = require('http');
+	var req = http.request(options, function(res) {
+	  if(res.statusCode != 200){
+			log.error("<- response from BW: " + res.statusCode + '\r\n');
+		}
+	});
+
+	req.on('error', function(e) {
+  		log.info('problem with call Reconnect PUT: ' + e.message + '\r\n');
+	});
+
+	req.end();
+	log.info('-> PUT ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callid + "/Reconnect" + '\r\n');
 };
 
 //**************** listen for incoming events ***********************

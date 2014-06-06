@@ -18,8 +18,8 @@ bwlogin = function(username, password){
 			$( "#credentials-modal-form" ).dialog( "close" );
 			localStorage.setItem("loggedin", true);
 			localStorage.setItem('username', username);
-			$('#call').css('background-color', '#093');
 			localStorage.setItem('softphonestate', 'free');
+			$('#call').css('background-color', '#093');
 			connect(username);
 			$('#loggeduser').text(localStorage.getItem(('username')));
 		},
@@ -106,11 +106,35 @@ makecall = function(destination){
 };
 
 transferCall = function(){
-	console.log('transfer call button clicked...');
 	var destination = $('#extensioninput').val();
-	console.log("Destination: " + destination);
 	var username = localStorage.getItem("username");
 	$.ajax({url: "/transfer_call/?username=" + username + "&destination=" + destination, 
+		cache: false,
+		success:function(result){
+			
+		},
+		error:function(xhr, status, result){
+			console.log("Status: " + status + "; result: " + result);
+		}
+	});
+};
+
+holdCall = function(callid){
+	var username = localStorage.getItem("username");
+	$.ajax({url: "/hold_call/?username=" + username + "&callid=" + callid, 
+		cache: false,
+		success:function(result){
+			
+		},
+		error:function(xhr, status, result){
+			console.log("Status: " + status + "; result: " + result);
+		}
+	});
+};
+
+retrieveCall = function(callid){
+	var username = localStorage.getItem("username");
+	$.ajax({url: "/retrieve_call/?username=" + username + "&callid=" + callid, 
 		cache: false,
 		success:function(result){
 			

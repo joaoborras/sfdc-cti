@@ -91,7 +91,7 @@ sup, #show_hidedialpad, .userdirectory{
 	vertical-align:middle;
 }
 
-.digit, #delete, #call, #hold, #transfer{
+.digit, #delete, #call, #hold, #retrieve, #transfer{
     cursor:pointer;
 }
 #call {
@@ -112,6 +112,11 @@ sup, #show_hidedialpad, .userdirectory{
     height:10px;
     background:gray;
 }
+#retrieve{
+    font-size:10px;
+    height:10px;
+    background:red;
+}
 /*related to the softphone modal form */
 a#credentials, a#signout{
    text-decoration:underline;
@@ -125,9 +130,6 @@ a#credentials, a#signout{
 /*Datepicker for the wrap up form*/
 .ui-datepicker{
     font-size:10px;
-}
-#callwrapup{
-    display:none;
 }
 /*modal forms: sign in and call transfer*/
 .ui-dialog-content, .ui-dialog-titlebar{

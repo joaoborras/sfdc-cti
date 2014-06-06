@@ -43,6 +43,8 @@ $('.digit').click(function(){
     $('#number').append(number);
 });
 
+//$('keyup')
+
 $('#clear').click(function(){
     $('#number').empty();
 });
@@ -129,8 +131,68 @@ $( "#calltransfer-modal-form" ).dialog({
         }
     ]
 });
-
 //until here Call Transfer modal form
+
+//call wrap-up modal form
+$( "#wrapup-modal-form" ).dialog({
+    autoOpen: false,
+    modal: true,
+    width: 150,
+    height: 250,
+    resizable: true,
+    title: "Call Wrap-up",
+    buttons: [
+        {
+            text: "Save",
+            click: function(){   
+                event.preventDefault();
+                var duedate = $('#duedatepicker').val();
+                console.log("Duedate is: " + duedate);
+                var subject = $('#subject').val();
+                var callresult = $('#callresult').val();
+                var priority = $('#priorities').val();
+                var status = $('#status').val();
+                var comments = $('#comments').val();
+                        
+                var saveParams = 'Subject=' + subject;
+                saveParams += '&Status=' + status;                 
+                saveParams += '&Activitydate=' + duedate;
+                saveParams += '&Phone=' + localStorage.getItem('callNumber');   
+                saveParams += '&Description=' + comments;
+                saveParams += '&Priority=' + priority;
+                saveParams += '&CallDisposition=' + callresult;
+                        
+                var objectId = localStorage.getItem('resultobjectid');
+
+                if(objectId.substr(0,3) == '003') {
+                    saveParams += '&whoId=' + objectId;                    
+                } else {
+                    saveParams += '&whatId=' + objectId;            
+                }
+                console.log('Params to be saved in call log: ' + saveParams);
+                sforce.interaction.saveLog('Task', saveParams, function(response){
+                    if(response.result){
+                        console.log("success in sforce.interaction.saveLog: " + response.result);
+                    }else{
+                        console.log("error in sforce.interaction.saveLog: " + response.error);
+                    }
+                });
+
+                localStorage.removeItem('resultobjectid');
+                $( "#wrapup-modal-form" ).dialog( "close" );
+            },
+            style: "position: relative; left: 0%",
+        },
+        {
+            text: "Cancel",
+            click: function(){
+                $( "#wrapup-modal-form" ).dialog( "close" );
+            },
+            style: "position: relative; right: -10%",
+        }
+    ]
+});
+//until here call wrap-up modal form
 
 //Sign out process will delete all localStorage variables and sign out the proxy
 $('#signout').click(function(){
@@ -138,52 +200,7 @@ $('#signout').click(function(){
     bwlogout(localStorage.getItem('username'));
 });
 
-//control Call Wrap Up form from here
 $( "#duedatepicker" ).datepicker({ dateFormat: "yy-mm-dd" });
-$('#wrapupok').click(function(){
-    event.preventDefault();
-    //show the values in wrap up form
-    var duedate = $('#duedatepicker').val();
-    console.log("Duedate is: " + duedate);
-    var subject = $('#subject').val();
-    var callresult = $('#callresult').val();
-    var priority = $('#priorities').val();
-    var status = $('#status').val();
-    var comments = $('#comments').val();
-            
-    var saveParams = 'Subject=' + subject;
-    saveParams += '&Status=' + status;                 
-    saveParams += '&Activitydate=' + duedate;
-    saveParams += '&Phone=' + localStorage.getItem('callNumber');   
-    saveParams += '&Description=' + comments;
-    saveParams += '&Priority=' + priority;
-    saveParams += '&CallDisposition=' + callresult;
-            
-    var objectId = localStorage.getItem('resultobjectid');
-
-    if(objectId.substr(0,3) == '003') {
-        saveParams += '&whoId=' + objectId;                    
-    } else {
-        saveParams += '&whatId=' + objectId;            
-    }
-    console.log('Params to be saved in call log: ' + saveParams);
-    sforce.interaction.saveLog('Task', saveParams, function(response){
-        if(response.result){
-            console.log("success in sforce.interaction.saveLog: " + response.result);
-        }else{
-            console.log("error in sforce.interaction.saveLog: " + response.error);
-        }
-    });
-
-    localStorage.removeItem('resultobjectid');
-    $('#callwrapup').css('display', 'none');
-});
-$('#wrapupcancel').click(function(){
-    event.preventDefault();
-    $('#callwrapup').css('display', 'none');
-    localStorage.removeItem('resultobjectid');
-});
-//up to here
 
 $('#call').click(function(){
     event.preventDefault();
@@ -207,6 +224,16 @@ $('#transfer').click(function(){
     getUserDir();
 });
 
+$('#hold').click(function(){
+    event.preventDefault();
+    var holdstate = localStorage.getItem('holdstate');
+    if(holdstate == 'free'){
+        holdCall(localStorage.getItem('callId'));
+    }else if(holdstate == 'held'){
+        retrieveCall(localStorage.getItem('callId'));
+    }
+});
+
 $('#declinecall').click(function(){
     event.preventDefault();
     var username = $('#username').val();
@@ -225,7 +252,7 @@ $('#declinecall').click(function(){
 saveCallLog = function (response) {
     var result = JSON.parse(response.result);
     localStorage.setItem('resultobjectid', result.objectId);
-    $('#callwrapup').css('display', 'inline');
+    $( "#wrapup-modal-form" ).dialog('open');
 };
 
 function identifyCaller(caller){

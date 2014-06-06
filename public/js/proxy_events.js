@@ -64,7 +64,7 @@ processchunk = function(chunk){
 				localStorage.setItem('callId', callid);
 				localStorage.setItem('calledtype', "inbound");
 				localStorage.setItem("softphonestate", 'incomingcall');
-				localStorage.setItem('callLogSubject', 'Call On');
+				localStorage.setItem('holdstate', 'free');
 				identifyCaller(callerid);
 				//sforce.interaction.searchAndScreenPop(callerid,'','inbound');
 				pulseCallButton();
@@ -80,15 +80,14 @@ processchunk = function(chunk){
 			localStorage.setItem('callId', callid);
 			localStorage.setItem('calledtype', "outbound");
 			localStorage.setItem("softphonestate", 'outgoingcall');
-			localStorage.setItem('callLogSubject', 'Call On');
 			$('#number').html('Call To: ' + callingid);
 			break;
 		case 'CallAnsweredEvent':
 			console.log("<- CallAnsweredEvent");
 			var callstarttime = new Date().getTime();
 			localStorage.setItem('callStartTime', callstarttime);
-			$('#number').text('Talking');
 			localStorage.setItem("softphonestate", 'busy');
+			$('#number').text('Talking');
 			//change background color of "call" icon to #ff0000(red)
 			$('#call').css('background-color', '#ff0000');
 			var callerid = $(chunk).find('callerid').text();
@@ -101,7 +100,7 @@ processchunk = function(chunk){
 				var callendtime = new Date().getTime();
 				localStorage.setItem('callEndTime', callendtime);
 				localStorage.setItem("softphonestate", 'free');
-				localStorage.setItem('callDisposition', 'successfull');
+				localStorage.removeItem('holdstate');
 				$('#number').html("");
 				//change background color of "call" icon to #0c3(green)
 				$('#call').css('background-color', '#093');
@@ -113,6 +112,14 @@ processchunk = function(chunk){
 				$( "#calltransfer-modal-form" ).dialog( "close" );
 				localStorage.removeItem('calltransfermodal');
 			}
+			break;
+		case 'CallHeldEvent':
+			$('#hold').attr('id', 'retrieve');
+			localStorage.setItem('holdstate', 'held');
+			break;
+		case 'CallRetrievedEvent':
+			$('#retrieve').attr('id', 'hold');
+			localStorage.setItem('holdstate', 'free');
 			break;
 		default:
 	}
