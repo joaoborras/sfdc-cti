@@ -1,25 +1,5 @@
 var mainXhr;
 
-/*function startHeartbeat(){
-	if(localStorage.getItem("loggedin") == "true"){
-		setTimeout(function(){
-			$.ajax({
-				cache:false,
-				url: '/heartbeat/?username=' + localStorage.getItem('username'),
-				success:function(result){
-					//startHeartbeat();
-				},
-				error: function(xhr, status, result){//probably proxy crush
-					console.log('Main HTTP session closed by proxy crash.');
-					$("#dialog_mainhttp_disconnection").dialog("open");
-					localStorage.removeItem('softphonestate');
-					localStorage.setItem("loggedin", false);
-					localStorage.removeItem('username');
-				}
-			});
-		}, 15000);
-	}
-};*/
 function startHeartbeat(){
 	if(localStorage.getItem("loggedin") == "true"){
 		$.ajax({

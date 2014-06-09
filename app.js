@@ -1094,45 +1094,42 @@ mainhttps.createServer(opts, app).listen(app.get('port'), function(){
 //**************** start the server by registering a channel in BW ************
 requestChannel();
 
+//************************* gracefull shutdown ********************************
 process.on( 'SIGINT', function() {
-  console.log( "\nGracefully shutting down from SIGINT (Ctrl-C)" );
-  //close the main http connection for all users
-  for(var i = 0; i<credentials.length; i++){
-  	if(credentials[i].username != '' )
-  	{
-  		var responseobj = credentials[i].appId;
-	  	var disconnectionevent = '<Event>';
-		disconnectionevent += '<eventtype>DisconnectionEvent</eventtype>';
-		disconnectionevent += '</Event>';
-		try{
-			responseobj.write(disconnectionevent);
-		}catch(error){
-			console.log('no objectresponse to send data too...');
-			continue;
-		}
+	console.log( "\nGracefully shutting down from SIGINT (Ctrl-C)" );
+  	//close the main http connection for all users
+  	for(var i = 0; i<credentials.length; i++){
+  		if(credentials[i].username != '' )
+  		{
+  			var responseobj = credentials[i].appId;
+	  		var disconnectionevent = '<Event>';
+			disconnectionevent += '<eventtype>DisconnectionEvent</eventtype>';
+			disconnectionevent += '</Event>';
+			try{
+				responseobj.write(disconnectionevent);
+			}catch(error){
+				console.log('no objectresponse to send data too...');
+				continue;
+			}
+  		}
   	}
-  }
-  //delete all signed in subscribers
-  credentials.splice(0, credentials.length);
+  	//delete all signed in subscribers
+  	credentials.splice(0, credentials.length);
 
-  //clear timers for heartbeat, channel and subscription update
-  clearInterval(bwconnection.channelUpdateIntervalId);
-  clearInterval(bwconnection.subscriptionUpdateIntervalId);
-  clearInterval(bwconnection.heartbeatIntervalId);
+  	//clear timers for heartbeat, channel and subscription update
+  	clearInterval(bwconnection.channelUpdateIntervalId);
+  	clearInterval(bwconnection.subscriptionUpdateIntervalId);
+  	clearInterval(bwconnection.heartbeatIntervalId);
 
-  //delete all subscriptions
-  shuttingdown = true;
-  deleteSubscription(function(){
-  	console.log('subscription delete callback');
-  	/*deleteChannel(function(){
-  		console.log('delete channel callback');
-  		process.exit( );
-  	});*/
-  });
+  	shuttingdown = true;
+  	//delete all subscriptions
+  	deleteSubscription(function(){
+  		console.log('subscription delete callback');
+  	});
   //release all ongoing calls (???)
 });
 
-exitServer = function(){
+exitServer = function(){//this function is called upon the reception of ChannelTerminatedEvent
 	//http.close();
 	process.exit();
 };
