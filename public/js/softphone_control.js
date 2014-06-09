@@ -122,7 +122,7 @@ $( "#credentials-modal-form" ).dialog({
 $( "#calltransfer-modal-form" ).dialog({
     autoOpen: false,
     modal: true,
-    width: 150,
+    width: 180,
     height: 250,
     resizable: false,
     title: "Extensions",
@@ -149,7 +149,7 @@ $( "#calltransfer-modal-form" ).dialog({
 $( "#wrapup-modal-form" ).dialog({
     autoOpen: false,
     modal: true,
-    width: 150,
+    width: 180,
     height: 250,
     resizable: true,
     title: "Call Wrap-up",
