@@ -1,13 +1,13 @@
 var mainXhr;
 
-function startHeartbeat(){
+/*function startHeartbeat(){
 	if(localStorage.getItem("loggedin") == "true"){
 		setTimeout(function(){
 			$.ajax({
 				cache:false,
 				url: '/heartbeat/?username=' + localStorage.getItem('username'),
 				success:function(result){
-					startHeartbeat();
+					//startHeartbeat();
 				},
 				error: function(xhr, status, result){//probably proxy crush
 					console.log('Main HTTP session closed by proxy crash.');
@@ -18,6 +18,24 @@ function startHeartbeat(){
 				}
 			});
 		}, 15000);
+	}
+};*/
+function startHeartbeat(){
+	if(localStorage.getItem("loggedin") == "true"){
+		$.ajax({
+			cache:false,
+			url: '/heartbeat/?username=' + localStorage.getItem('username'),
+			success:function(result){
+				//startHeartbeat();
+			},
+			error: function(xhr, status, result){//probably proxy crush
+				console.log('Main HTTP session closed by proxy crash.');
+				$("#dialog_mainhttp_disconnection").dialog("open");
+				localStorage.removeItem('softphonestate');
+				localStorage.setItem("loggedin", false);
+				localStorage.removeItem('username');
+			}
+		});
 	}
 };
 
@@ -60,6 +78,7 @@ processchunk = function(chunk){
 			localStorage.removeItem('softphonestate');
 			localStorage.setItem("loggedin", false);
 			localStorage.removeItem('username');
+			mainXhr.abort();
 			break;
 		case 'LogOutResponse':
 			console.log('<- LogOutResponse');
@@ -72,6 +91,9 @@ processchunk = function(chunk){
 			break;
 		case 'HeartBeatResponse':
 			console.log('<- HeartBeatResponse');
+			setTimeout(function(){
+				startHeartbeat();
+			}, 15000);
 			break;
 		case 'CallReceivedEvent':
 			var callid = $(chunk).find('callid').text();

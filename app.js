@@ -9,6 +9,7 @@ var credentials = [{
 
 //this array stores all the BW groups from all clients. A subscription must be opened for each one
 var BW_groups = ['PBXL_Test',];
+var shuttingdown = false;
 
 //this object stores data related to BW for each ZD's app. These data are unique to the application
 //as there is only one channel and subscription, that will receive all events from BW related to 
@@ -429,7 +430,7 @@ updateChannel = function(){
 	log.info('-> PUT ' + BW_URL + '/com.broadsoft.xsi-events/v2.0/channel/' + bwconnection.channelId + '\r\n' + xml_data + '\r\n');
 };
 
-deleteChannel = function(){
+deleteChannel = function(callback){
 	console.log("-> INFO: deleteChannel ID " + bwconnection.channelId);
 	log.info("-> deleteChannel ID " + bwconnection.channelId);
 	var options = {
@@ -441,6 +442,7 @@ deleteChannel = function(){
 	};
 	var http = require('http');
 	var req = http.request(options, function(res){
+		callback(res.statusCode);
 	});
 	req.on('error', function(e) {
   		console.log('problem with deleteChannel request: ' + e.message);
@@ -558,7 +560,7 @@ updateSubscription = function(){
 	log.info('-> PUT ' + BW_URL + "/com.broadsoft.xsi-events/v2.0/subscription/" + bwconnection.subscriptionId + '\r\n' + xml_data + '\r\n');
 };
 
-deleteSubscription = function(){
+deleteSubscription = function(callback){
 	console.log("-> INFO: deleteSubscription ID " + bwconnection.subscriptionId);
 	log.info("-> deleteSubscription ID " + bwconnection.subscriptionId);
 	var options = {
@@ -571,6 +573,7 @@ deleteSubscription = function(){
 	var http = require('http');
 	var req = http.request(options, function(res){
 		console.log('deleteSubscription answer: ' + res.statusCode);
+		callback(res.statusCode);
 	});
 
 	req.on('error', function(e) {
@@ -633,12 +636,22 @@ parseChunk = function(chunk){ //chunk is already string
 	}else if(chunk.indexOf('ChannelTerminatedEvent') >= 0){
 		console.log("WARNING: ChannelTerminatedEvent <-");
 		log.warning("ChannelTerminatedEvent <-");
-		bwconnection.channelId = '';
-		requestChannel();
+		if(shuttingdown){
+			exitServer();
+		}else{
+			bwconnection.channelId = '';
+			requestChannel();
+		}
 	}else if(chunk.indexOf('SubscriptionTerminatedEvent') >= 0){//will open a new subscription
 		console.log('WARNING: SubscriptionTerminatedEvent <-');
 		log.warning('SubscriptionTerminatedEvent <-');
-		bwconnection.subscriptionId = '';
+		if(shuttingdown){
+			deleteChannel(function(){
+				console.log('delete channel callback');
+			});
+		}else{
+			bwconnection.subscriptionId = '';
+		}
 		//eventSubscription('Advanced Call');
 	}else if(chunk.indexOf('<xsi:Event ') >= 0){//xsi:Event received. Now see if it is channel disconnection
 		//for every xsi:Event, needs to send event Response
@@ -1084,27 +1097,42 @@ requestChannel();
 process.on( 'SIGINT', function() {
   console.log( "\nGracefully shutting down from SIGINT (Ctrl-C)" );
   //close the main http connection for all users
-  for(var x in credentials){
-  	var responseobj = credentials[x].appId;
-  	var disconnectionevent = '<Event>';
-	disconnectionevent += '<eventtype>DisconnectionEvent</eventtype>';
-	disconnectionevent += '</Event>';
-	try{
-		responseobj.end(disconnectionevent);
-	}catch(error){
-		console.log('no objectresponse to send data too...');
-	}
+  for(var i = 0; i<credentials.length; i++){
+  	if(credentials[i].username != '' )
+  	{
+  		var responseobj = credentials[i].appId;
+	  	var disconnectionevent = '<Event>';
+		disconnectionevent += '<eventtype>DisconnectionEvent</eventtype>';
+		disconnectionevent += '</Event>';
+		try{
+			responseobj.write(disconnectionevent);
+		}catch(error){
+			console.log('no objectresponse to send data too...');
+			continue;
+		}
+  	}
   }
   //delete all signed in subscribers
   credentials.splice(0, credentials.length);
-  //delete all subscriptions
-  deleteSubscription();
-  deleteChannel();
+
   //clear timers for heartbeat, channel and subscription update
   clearInterval(bwconnection.channelUpdateIntervalId);
   clearInterval(bwconnection.subscriptionUpdateIntervalId);
   clearInterval(bwconnection.heartbeatIntervalId);
 
+  //delete all subscriptions
+  shuttingdown = true;
+  deleteSubscription(function(){
+  	console.log('subscription delete callback');
+  	/*deleteChannel(function(){
+  		console.log('delete channel callback');
+  		process.exit( );
+  	});*/
+  });
   //release all ongoing calls (???)
-  process.exit( );
 });
+
+exitServer = function(){
+	//http.close();
+	process.exit();
+};
