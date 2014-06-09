@@ -15,6 +15,7 @@ bwlogin = function(username, password){
 	$.ajax({url: "/log_in/?username=" + username + "&password=" + password, 
 		cache: false,
 		success:function(result){
+			console.log("received success from bwlogin ajax call");
 			$( "#credentials-modal-form" ).dialog( "close" );
 			localStorage.setItem("loggedin", true);
 			localStorage.setItem('username', username);
@@ -24,6 +25,7 @@ bwlogin = function(username, password){
 			$('#loggeduser').text(localStorage.getItem(('username')));
 		},
 		error: function(xhr, status, result){
+			console.log("received error from bwlogin ajax call");
 			if(xhr.status == 404){
 				alert(xhr.status + " - " + result + ": Please verify your credentials");
 			}
@@ -35,13 +37,10 @@ bwlogout = function(username){
 	$.ajax({url: "/log_out/?username=" + username, 
 		cache: false,
 		success:function(result){
-			localStorage.removeItem('softphonestate');
-			localStorage.setItem("loggedin", false);
-			localStorage.removeItem('username');
-			$( "#credentials-modal-form" ).dialog( "open" );
-			$('#loggeduser').text('');			
+			console.log("received success from bwlogout ajax call");	
 		},
 		error: function(xhr, status, result){
+			console.log("received error from bwlogout ajax call");
 			console.log("Status: " + status + "; result: " + result);
 		}
 	});

@@ -1,3 +1,5 @@
+var mainXhr;
+
 function startHeartbeat(){
 	if(localStorage.getItem("loggedin") == "true"){
 		setTimeout(function(){
@@ -13,7 +15,7 @@ function startHeartbeat(){
 };
 
 function connect(username){
-	var mainXhr = new XMLHttpRequest();
+	mainXhr = new XMLHttpRequest();
 	console.log('-> /connect/?username=' + username);
 	var url = '/connect/?username=' + username;
 	mainXhr.open('POST', url, true);
@@ -33,12 +35,13 @@ function connect(username){
 		}
 	};
 	mainXhr.onloadend = function() {
-		console.log('Main HTTP session closed! Will connect again in 5 secs...');
-		//Will try to connect again until it gets a connection
-		//$("#dialog_mainhttp_disconnection").dialog("open");
-		setTimeout(function(){
-			connect(localStorage.getItem('username'));
-		}, 5000);
+		if(localStorage.getItem('loggedin') == 'true'){//closed by error in the server so, try new connection
+			console.log('Main HTTP session closed! Will have to login again...');
+			$("#dialog_mainhttp_disconnection").dialog("open");
+			localStorage.removeItem('softphonestate');
+			localStorage.setItem("loggedin", false);
+			localStorage.removeItem('username');
+		}
 	};
 	mainXhr.send();
 };
@@ -48,8 +51,16 @@ processchunk = function(chunk){
 	switch(eventtype){
 		case 'ConnectResponse':
 			console.log('<- ConnectResponse');
-			//$("#dialog_mainhttp_disconnection").dialog("close");
 			startHeartbeat();
+			break;
+		case 'LogOutResponse':
+			console.log('<- LogOutResponse');
+			localStorage.removeItem('softphonestate');
+			localStorage.setItem("loggedin", false);
+			localStorage.removeItem('username');
+			$( "#credentials-modal-form" ).dialog( "open" );
+			$('#loggeduser').text('');	
+			mainXhr.abort();
 			break;
 		case 'HeartBeatResponse':
 			console.log('<- HeartBeatResponse');

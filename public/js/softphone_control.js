@@ -73,8 +73,20 @@ $("#dialog_mainhttp_disconnection").dialog({
     autoOpen: false,
     resizable: false,
     height:140,
-    width: 250,
-    modal: true
+    width: 180,
+    modal: true,
+    title: "Server disconnection!",
+    buttons: [
+        {
+            text: "Ok",
+            click: function(){
+                $(this).dialog('close');
+                $( "#credentials-modal-form" ).dialog( "open" );
+                $('#loggeduser').text('');
+            },
+            style: "position: relative; left: -20%",
+        },
+    ]
 });
 //end of modal dialog for when the main streaming HTTP connection is lost
 
