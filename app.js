@@ -158,6 +158,11 @@ app.all("/log_out/", function(req, res){
 	for(var index in credentials){
 		if(credentials[index].username === req.param('username')){
 			console.log("found user " + req.param('username') + " in credentials and will now delete it");
+			var responseobj = credentials[index].appId;
+			var logoutresponse = '<Event>';
+			logoutresponse += '<eventtype>LogOutResponse</eventtype>';
+			logoutresponse += '</Event>';
+			responseobj.write(logoutresponse);
 			credentials.splice(index, 1);
 			break;
 		}
