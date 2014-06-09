@@ -426,7 +426,28 @@ updateChannel = function(){
 
 	req.write(xml_data);
 	req.end();
-	log.info('-> POST ' + BW_URL + '/com.broadsoft.xsi-events/v2.0/channel/' + bwconnection.channelId + '\r\n' + xml_data + '\r\n');
+	log.info('-> PUT ' + BW_URL + '/com.broadsoft.xsi-events/v2.0/channel/' + bwconnection.channelId + '\r\n' + xml_data + '\r\n');
+};
+
+deleteChannel = function(){
+	console.log("-> INFO: deleteChannel ID " + bwconnection.channelId);
+	log.info("-> deleteChannel ID " + bwconnection.channelId);
+	var options = {
+		host: BW_URL,
+		path: "/com.broadsoft.xsi-events/v2.0/channel/" + bwconnection.channelId,
+		method: 'DELETE',
+		auth: bwconnection.groupadmin + ':' + bwconnection.groupadminpassword,
+		headers: {'Content-Type': 'text/xml'}
+	};
+	var http = require('http');
+	var req = http.request(options, function(res){
+	});
+	req.on('error', function(e) {
+  		console.log('problem with deleteChannel request: ' + e.message);
+	});
+
+	req.end();
+	log.info('-> DELETE ' + BW_URL + '/com.broadsoft.xsi-events/v2.0/channel/' + bwconnection.channelId + '\r\n');
 };
 
 startHeartbeat = function(){
@@ -534,7 +555,30 @@ updateSubscription = function(){
 
 	req.write(xml_data);
 	req.end();
-	log.info('-> POST ' + BW_URL + "/com.broadsoft.xsi-events/v2.0/subscription/" + bwconnection.subscriptionId + '\r\n' + xml_data + '\r\n');
+	log.info('-> PUT ' + BW_URL + "/com.broadsoft.xsi-events/v2.0/subscription/" + bwconnection.subscriptionId + '\r\n' + xml_data + '\r\n');
+};
+
+deleteSubscription = function(){
+	console.log("-> INFO: deleteSubscription ID " + bwconnection.subscriptionId);
+	log.info("-> deleteSubscription ID " + bwconnection.subscriptionId);
+	var options = {
+		host: BW_URL,
+		path: "/com.broadsoft.xsi-events/v2.0/subscription/" + bwconnection.subscriptionId ,
+		method: 'DELETE',
+		auth: bwconnection.groupadmin + ':' + bwconnection.groupadminpassword,
+		headers: {'Content-Type': 'text/xml'}
+	};
+	var http = require('http');
+	var req = http.request(options, function(res){
+		console.log('deleteSubscription answer: ' + res.statusCode);
+	});
+
+	req.on('error', function(e) {
+  		console.log('problem with request: ' + e.message);
+	});
+
+	req.end();
+	log.info('-> DELETE ' + BW_URL + "/com.broadsoft.xsi-events/v2.0/subscription/" + bwconnection.subscriptionId + '\r\n');
 };
 
 sendResponseEvent = function(eventId){
@@ -1036,3 +1080,31 @@ mainhttps.createServer(opts, app).listen(app.get('port'), function(){
 });
 //**************** start the server by registering a channel in BW ************
 requestChannel();
+
+process.on( 'SIGINT', function() {
+  console.log( "\nGracefully shutting down from SIGINT (Ctrl-C)" );
+  //close the main http connection for all users
+  for(var x in credentials){
+  	var responseobj = credentials[x].appId;
+  	var disconnectionevent = '<Event>';
+	disconnectionevent += '<eventtype>DisconnectionEvent</eventtype>';
+	disconnectionevent += '</Event>';
+	try{
+		responseobj.end(disconnectionevent);
+	}catch(error){
+		console.log('no objectresponse to send data too...');
+	}
+  }
+  //delete all signed in subscribers
+  credentials.splice(0, credentials.length);
+  //delete all subscriptions
+  deleteSubscription();
+  deleteChannel();
+  //clear timers for heartbeat, channel and subscription update
+  clearInterval(bwconnection.channelUpdateIntervalId);
+  clearInterval(bwconnection.subscriptionUpdateIntervalId);
+  clearInterval(bwconnection.heartbeatIntervalId);
+
+  //release all ongoing calls (???)
+  process.exit( );
+});

@@ -8,6 +8,13 @@ function startHeartbeat(){
 				url: '/heartbeat/?username=' + localStorage.getItem('username'),
 				success:function(result){
 					startHeartbeat();
+				},
+				error: function(xhr, status, result){//probably proxy crush
+					console.log('Main HTTP session closed by proxy crash.');
+					$("#dialog_mainhttp_disconnection").dialog("open");
+					localStorage.removeItem('softphonestate');
+					localStorage.setItem("loggedin", false);
+					localStorage.removeItem('username');
 				}
 			});
 		}, 15000);
@@ -35,13 +42,7 @@ function connect(username){
 		}
 	};
 	mainXhr.onloadend = function() {
-		if(localStorage.getItem('loggedin') == 'true'){//closed by error in the server so, try new connection
-			console.log('Main HTTP session closed! Will have to login again...');
-			$("#dialog_mainhttp_disconnection").dialog("open");
-			localStorage.removeItem('softphonestate');
-			localStorage.setItem("loggedin", false);
-			localStorage.removeItem('username');
-		}
+		console.log('closing main http session');
 	};
 	mainXhr.send();
 };
@@ -52,6 +53,13 @@ processchunk = function(chunk){
 		case 'ConnectResponse':
 			console.log('<- ConnectResponse');
 			startHeartbeat();
+			break;
+		case 'DisconnectionEvent'://sent when the proxy finsihes gracefully
+			console.log('Main HTTP session closed by proxy gracefull close.');
+			$("#dialog_mainhttp_disconnection").dialog("open");
+			localStorage.removeItem('softphonestate');
+			localStorage.setItem("loggedin", false);
+			localStorage.removeItem('username');
 			break;
 		case 'LogOutResponse':
 			console.log('<- LogOutResponse');
@@ -91,6 +99,7 @@ processchunk = function(chunk){
 			localStorage.setItem('callId', callid);
 			localStorage.setItem('calledtype', "outbound");
 			localStorage.setItem("softphonestate", 'outgoingcall');
+			localStorage.setItem('holdstate', 'free');
 			$('#number').html('Call To: ' + callingid);
 			break;
 		case 'CallAnsweredEvent':

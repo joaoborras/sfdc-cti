@@ -119,6 +119,7 @@ transferCall = function(){
 };
 
 holdCall = function(callid){
+	console.log("holdCall called");
 	var username = localStorage.getItem("username");
 	$.ajax({url: "/hold_call/?username=" + username + "&callid=" + callid, 
 		cache: false,
