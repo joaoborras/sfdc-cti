@@ -100,7 +100,7 @@ sup, #show_hidedialpad, .userdirectory{
 	vertical-align:middle;
 }
 
-.digit, #delete, #call, #hold, #retrieve, #transfer{
+.digit, #clear, #delete, #call, #hold, #retrieve, #transfer{
     cursor:pointer;
 }
 #call {
