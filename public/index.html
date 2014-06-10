@@ -63,6 +63,15 @@
     </div>
 	<!-- end of jQuery dial-pad -->
 	<button id="show_hidedialpad" type="button">Show dialpad</button>
+	
+	<!-- taking notes text area -->
+	<div id='takenotesform'>
+		<textarea id='takenotes' rows='10' cols='20'>Notes</textarea><br/>
+		<button id='savenotes' type='button'>Save</button>
+		<button id='cancelnotes' type='button'>Cancel</button>
+	</div>
+	<!-- until here taking notes text area -->
+
 	<!-- Call Wrap Up form -->
 	<div>
 	    <form id='wrapup-modal-form'>
@@ -84,9 +93,9 @@
 	        </select><br/>
 	        <label>Status:</label><br/>
 	        <select id='status'>
-	            <option value='Not Started'>Not Started</option>
-	            <option value='In Progress'>In Progress</option>
 	            <option value='Completed'>Completed</option>
+	            <option value='In Progress'>In Progress</option>
+	            <option value='Not Started'>Not Started</option>
 	            <option value='Waiting on someone else'>Waiting someone else</option>
 	            <option value='Deferred'>Deferred</option>
 	        </select><br/>

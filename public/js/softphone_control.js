@@ -7,6 +7,7 @@ $('document').ready(function(){
                 console.log('user is signed in');
                 connect(localStorage.getItem("username"));
                 $('#loggeduser').text(localStorage.getItem(('username')));
+                $('#signout').css('display', 'inline');
             }else{
                 console.log('user is not signed in');
                 localStorage.removeItem('softphonestate');
@@ -35,6 +36,14 @@ $('document').ready(function(){
     }else if(dialpaddisplay == 'inline'){
         $('#dialpad').css('display', 'inline');
         $('#show_hidedialpad').text("Hide dialpad");
+    }
+
+    //this is to maintain the status of the taking notes area
+    var takingnotesdisplay = localStorage.getItem('takingnotes');
+    if(takingnotesdisplay == 'true'){
+        $('#takenotesform').css('display', 'inline');
+    }else{
+        $('#takenotesform').css('display', 'none');
     }
 });
 
@@ -83,6 +92,7 @@ $("#dialog_mainhttp_disconnection").dialog({
                 $(this).dialog('close');
                 $( "#credentials-modal-form" ).dialog( "open" );
                 $('#loggeduser').text('');
+                $('#signout').css('display', 'none');
             },
             style: "position: relative; left: -20%",
         },
@@ -106,14 +116,14 @@ $( "#credentials-modal-form" ).dialog({
             //style: "font-size:10px;position:relative;left:-90px",
             style: "position: relative; left: -20%",
         },
-        {
+        /*{
             text: "Cancel",
             click: function(){
                 $( "#credentials-modal-form" ).dialog( "close" );
             },
             //style: "font-size:10px;position:relative;left:0px",
             style: "position: relative; right: -10%",
-        }
+        }*/
     ]
 }); 
 //End of Sign In modal form
@@ -164,7 +174,8 @@ $( "#wrapup-modal-form" ).dialog({
                 var callresult = $('#callresult').val();
                 var priority = $('#priorities').val();
                 var status = $('#status').val();
-                var comments = $('#comments').val();
+                //var comments = $('#comments').val();
+                var comments = $('#takenotes').val();//take text from take notes area
                         
                 var saveParams = 'Subject=' + subject;
                 saveParams += '&Status=' + status;                 
@@ -185,12 +196,14 @@ $( "#wrapup-modal-form" ).dialog({
                 sforce.interaction.saveLog('Task', saveParams, function(response){
                     if(response.result){
                         console.log("success in sforce.interaction.saveLog: " + response.result);
+                        sforce.interaction.refreshPage(refreshsfdcpage_callback);
                     }else{
                         console.log("error in sforce.interaction.saveLog: " + response.error);
                     }
                 });
 
                 localStorage.removeItem('resultobjectid');
+                localStorage.removeItem('takingnotes');
                 $( "#wrapup-modal-form" ).dialog( "close" );
             },
             style: "position: relative; left: 0%",
@@ -205,6 +218,23 @@ $( "#wrapup-modal-form" ).dialog({
     ]
 });
 //until here call wrap-up modal form
+
+//Take notes text area
+$('#savenotes').click(function(){
+    event.preventDefault();
+    //show the notes in the wrap up "comments" area as well);
+    $('#comments').text($('#takenotes').val());
+
+    sforce.interaction.getPageInfo(saveCallLog); //save call log in SFDC
+    $('#takenotesform').css('display', 'none');
+});
+
+$('#cancelnotes').click(function(){
+    event.preventDefault();
+    $('#takenotes').val('');
+    $('#takenotesform').css('display', 'none');
+});
+//until here take notes text area
 
 //Sign out process will delete all localStorage variables and sign out the proxy
 $('#signout').click(function(){
@@ -336,6 +366,14 @@ click2diallistener = function (response) {
             var result = JSON.parse(response.result);
             makecall(result.number);    
         }
+    }
+};
+
+refreshsfdcpage_callback = function(response){
+    if(response.result){
+        console.log("Page refresh has been invoked");
+    }else{
+        console.log("Page refreseh has NOT been invoked");
     }
 };
 

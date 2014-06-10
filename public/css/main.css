@@ -45,6 +45,15 @@ margin-left:3px;
 line-height:100%;
 }
 
+/*take notes text area*/
+#takenotesform{
+  display:none;
+  background:#fff;
+}
+
+#signout{
+  display:none;
+}
 
 /* dialpad */
 #dialpad{

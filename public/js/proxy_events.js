@@ -68,6 +68,7 @@ processchunk = function(chunk){
 			$( "#credentials-modal-form" ).dialog( "open" );
 			$('#loggeduser').text('');	
 			mainXhr.abort();
+			$('#signout').css('display', 'none');
 			break;
 		case 'HeartBeatResponse':
 			console.log('<- HeartBeatResponse');
@@ -114,6 +115,8 @@ processchunk = function(chunk){
 			$('#call').css('background-color', '#ff0000');
 			var callerid = $(chunk).find('callerid').text();
 			sforce.interaction.searchAndScreenPop(callerid,'','inbound', searchAndGetScreenPopUrl_callback);
+			$('#takenotesform').css('display', 'inline');
+			localStorage.setItem('takingnotes', 'true');
 			break;
 		case 'CallReleasedEvent':
 			var callid = $(chunk).find('callid').text();
@@ -126,7 +129,8 @@ processchunk = function(chunk){
 				$('#number').html("");
 				//change background color of "call" icon to #0c3(green)
 				$('#call').css('background-color', '#093');
-				sforce.interaction.getPageInfo(saveCallLog); //save call log in SFDC
+				//will call the function below when the user press "Save" in take notes area
+				//sforce.interaction.getPageInfo(saveCallLog); //save call log in SFDC
 			}
 			break;
 		case 'CallRedirectedEvent':

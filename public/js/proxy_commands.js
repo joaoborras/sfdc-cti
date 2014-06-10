@@ -23,6 +23,7 @@ bwlogin = function(username, password){
 			$('#call').css('background-color', '#093');
 			connect(username);
 			$('#loggeduser').text(localStorage.getItem(('username')));
+			$('#signout').css('display', 'inline');
 		},
 		error: function(xhr, status, result){
 			console.log("received error from bwlogin ajax call");

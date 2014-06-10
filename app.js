@@ -1081,12 +1081,13 @@ retrieveCall = function(username, callid){
 };
 
 //**************** listen for incoming events ***********************
-var opts = {key: fs.readFileSync('key.pem'), cert: fs.readFileSync('cert.pem')};
+//var opts = {key: fs.readFileSync('key.pem'), cert: fs.readFileSync('cert.pem')};
 
 /*http.createServer(app).listen(app.get('port'), function() {
 	console.log('Express server listening on port ' + app.get('port'));
 });*/
 
+var opts = {key: fs.readFileSync('server.key'), cert: fs.readFileSync('server.crt')};
 mainhttps = require('https'); //the https object to connect the client with the proxy
 mainhttps.createServer(opts, app).listen(app.get('port'), function(){
 	console.log('Express HTTPS server listening on port ' + app.get('port'));
