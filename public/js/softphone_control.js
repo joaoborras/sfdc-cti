@@ -233,6 +233,7 @@ $('#cancelnotes').click(function(){
     event.preventDefault();
     $('#takenotes').val('');
     $('#takenotesform').css('display', 'none');
+    localStorage.removeItem('takingnotes');
 });
 //until here take notes text area
 
