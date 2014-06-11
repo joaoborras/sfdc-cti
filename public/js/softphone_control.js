@@ -32,10 +32,10 @@ $('document').ready(function(){
     var dialpaddisplay = localStorage.getItem('dialpadstatus'); 
     if(dialpaddisplay == 'none'){
         $('#dialpad').css('display', 'none');
-        $('#show_hidedialpad').text("Show dialpad");
+        $('#show_hidedialpad').attr('id', 'dialpad_inactive');
     }else if(dialpaddisplay == 'inline'){
         $('#dialpad').css('display', 'inline');
-        $('#show_hidedialpad').text("Hide dialpad");
+        $('#show_hidedialpad').attr('id', 'dialpad_active');
     }
 
     //this is to maintain the status of the taking notes area
@@ -69,11 +69,11 @@ $('#show_hidedialpad').click(function(){
     if(dialpaddisplay == 'none'){
         $('#dialpad').css('display', 'inline');
         localStorage.setItem('dialpadstatus', 'inline');
-        $(this).text("Hide dialpad");
+        $(this).attr('id', 'dialpad_active');
     }else if(dialpaddisplay == 'inline'){
         $('#dialpad').css('display', 'none');
         localStorage.setItem('dialpadstatus', 'none');
-        $(this).text("Show dialpad");
+        $(this).attr('id', 'dialpad_inactive');
     }
 });
 

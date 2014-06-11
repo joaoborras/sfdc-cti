@@ -13,11 +13,27 @@ table{
 
 #title {
     padding:5px 0 0 0;
-background:#fff;
+	background:#fff;
     border-radius: 5px 5px 0 0;
--ms-border-radius: 5px;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
+	-ms-border-radius: 5px 5px 0 0;
+ 	-moz-border-radius: 5px 5px 0 0;
+ 	-webkit-border-radius: 5px 5px 0 0;
+}
+#logo{
+	display:inline;
+	margin-left:20px;
+}
+
+#show_hidesettings {
+	float:right;
+	padding:6px 7px;
+    background:#4e5660;
+    border-radius: 3px;
+	-ms-border-radius: 3px;
+ 	-moz-border-radius: 3px;
+ 	-webkit-border-radius: 3px;
+	margin:1px 7px 0 0;
+	display:block;
 }
 
 #visor{
@@ -39,6 +55,10 @@ background:#fff;
 	font-size:12px;
 }
 
+#number{
+    font-size:15px;
+    height:20px;
+}
 #visor sup{
     font-size:10px;
 margin-left:3px;
@@ -85,11 +105,17 @@ sup, #show_hidedialpad, .userdirectory{
 
 /* buttons */
 #buttons table{
-    border-spacing: 3px;
+    border-spacing: 2px;
 	border-collapse:separate;
+	background:#fff;
+    border-radius: 0 0 5px 5px;
+	-ms-border-radius: 0 0 5px 5px;
+ 	-moz-border-radius: 0 0 5px 5px;
+ 	-webkit-border-radius: 0 0 5px 5px;
 }
 #buttons td{
     color:#FFF;
+    height:25px;
     border-radius: 5px;
 	-ms-border-radius: 5px;
  	-moz-border-radius: 5px;
@@ -100,26 +126,23 @@ sup, #show_hidedialpad, .userdirectory{
 	vertical-align:middle;
 }
 
-.digit, #clear, #delete, #call, #hold, #retrieve, #transfer{
+.digit, #delete, #call, #hold, #transfer, #show_hidedialpad{
     cursor:pointer;
 }
 #call {
     background:#f08229;
 }
-#clear, #delete {
+#clear, #delete, #hold, #transfer{
     background:#4e5660;
 }
-#number{
-    font-size:15px;
-    height:20px;
+#dialpad_inactive{
+  background: #4e5660;
+}
+#dialpad_active{
+  background: #0000CD;
 }
 #extras{
     float:right;
-}
-#hold, #transfer{
-    font-size:10px;
-    height:10px;
-    background:gray;
 }
 #retrieve{
     font-size:10px;
