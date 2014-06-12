@@ -106,7 +106,7 @@ $( "#credentials-modal-form" ).dialog({
     modal: true,
     width: 180,
     resizable: false,
-    title: "BW Credentials",
+    //title: "BW Credentials",
     buttons: [
         {
             text: "Sign In",
@@ -115,7 +115,7 @@ $( "#credentials-modal-form" ).dialog({
             },
             style: "position: relative; left: -100px",
         },
-    ]
+    ],
 }); 
 //End of Sign In modal form
 

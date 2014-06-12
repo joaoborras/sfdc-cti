@@ -165,7 +165,7 @@ a#credentials, a#signout, a#bwcredentials, a#signin{
 }
 /*modal forms: sign in and call transfer*/
 .ui-dialog-content, .ui-dialog-titlebar{
-    font-size: 10px;
+    font-size: 10px; top;
 }
 fieldset {
     padding:0; 
