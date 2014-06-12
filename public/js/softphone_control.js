@@ -265,6 +265,12 @@ $('#signin').click(function(){
     $("#settings-modal-menu").dialog('close');
 });
 
+$('#notes').click(function(){
+    $('#takenotesform').css('display', 'inline');
+    localStorage.setItem('takingnotes', 'true');
+    $("#settings-modal-menu").dialog('close');
+});
+
 $( "#duedatepicker" ).datepicker({ dateFormat: "yy-mm-dd" });
 
 $('#call').click(function(){
