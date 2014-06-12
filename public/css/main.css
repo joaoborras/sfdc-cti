@@ -60,13 +60,13 @@ table{
     height:20px;
 }
 #visor sup{
-    font-size:10px;
-margin-left:3px;
-line-height:100%;
+  font-size:10px;
+  margin-left:3px;
+  line-height:100%;
 }
 
 /*take notes text area*/
-#takenotesform{
+#takenotesform, #settings-modal-menu{
   display:none;
   background:#fff;
 }
@@ -150,7 +150,7 @@ sup, #show_hidedialpad, .userdirectory{
     background:red;
 }
 /*related to the softphone modal form */
-a#credentials, a#signout{
+a#credentials, a#signout, a#bwcredentials, a#signin{
    text-decoration:underline;
    cursor:pointer;
    color: black;

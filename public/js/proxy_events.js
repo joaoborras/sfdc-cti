@@ -58,6 +58,7 @@ processchunk = function(chunk){
 			localStorage.removeItem('softphonestate');
 			localStorage.setItem("loggedin", false);
 			localStorage.removeItem('username');
+			localStorage.removeItem('takingnotes');
 			mainXhr.abort();
 			break;
 		case 'LogOutResponse':
@@ -65,6 +66,8 @@ processchunk = function(chunk){
 			localStorage.removeItem('softphonestate');
 			localStorage.setItem("loggedin", false);
 			localStorage.removeItem('username');
+			localStorage.removeItem('takingnotes');
+			$("#settings-modal-menu").dialog('close');
 			$( "#credentials-modal-form" ).dialog( "open" );
 			$('#loggeduser').text('');	
 			mainXhr.abort();

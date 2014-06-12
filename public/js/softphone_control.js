@@ -113,17 +113,8 @@ $( "#credentials-modal-form" ).dialog({
             click: function(){
                 bwlogin($('#username').val(), $('#password').val());
             },
-            //style: "font-size:10px;position:relative;left:-90px",
-            style: "position: relative; left: -20%",
+            style: "position: relative; left: -100px",
         },
-        /*{
-            text: "Cancel",
-            click: function(){
-                $( "#credentials-modal-form" ).dialog( "close" );
-            },
-            //style: "font-size:10px;position:relative;left:0px",
-            style: "position: relative; right: -10%",
-        }*/
     ]
 }); 
 //End of Sign In modal form
@@ -212,12 +203,39 @@ $( "#wrapup-modal-form" ).dialog({
             text: "Cancel",
             click: function(){
                 $( "#wrapup-modal-form" ).dialog( "close" );
+                localStorage.removeItem('takingnotes');
             },
             style: "position: relative; right: -10%",
         }
     ]
 });
 //until here call wrap-up modal form
+
+//settings modal dialog
+$( "#settings-modal-menu" ).dialog({
+    autoOpen: false,
+    modal: true,
+    width: 180,
+    resizable: false,
+    title: "Settings",
+    open: function(event, ui){
+        var softphonestate = localStorage.getItem('softphonestate');
+        if(softphonestate){
+            $('#settings_status').text('signed in');
+            $('#signin').css('display', 'none');
+        }else{
+            $('#settings_status').text('signed out');
+            $('#signout').css('display', 'none');
+            $('#signin').css('display', 'inline');
+        }
+    },
+});
+//until here setting modal dialog
+
+$('#show_hidesettings').click(function(){
+    event.preventDefault();
+    $("#settings-modal-menu").dialog('open');
+});
 
 //Take notes text area
 $('#savenotes').click(function(){
@@ -239,8 +257,12 @@ $('#cancelnotes').click(function(){
 
 //Sign out process will delete all localStorage variables and sign out the proxy
 $('#signout').click(function(){
-    console.log("Signing Out!");
     bwlogout(localStorage.getItem('username'));
+});
+
+$('#signin').click(function(){
+    $( "#credentials-modal-form" ).dialog('open');
+    $("#settings-modal-menu").dialog('close');
 });
 
 $( "#duedatepicker" ).datepicker({ dateFormat: "yy-mm-dd" });
