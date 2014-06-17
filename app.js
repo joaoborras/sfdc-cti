@@ -15,8 +15,8 @@ var shuttingdown = false;
 //as there is only one channel and subscription, that will receive all events from BW related to 
 //all opened calls
 var bwconnection = {
-	applicationId: 'broadsoft4sfdc',
-	channelSetId: 'broadsoft4sfdcchannelset',
+	applicationId: 'broadsoft4sfdclocal',
+	channelSetId: 'broadsoft4sfdclocalchannelset',
 	channelId: '',
 	heartbeatIntervalId: '',
 	channelUpdateIntervalId: '',
@@ -74,7 +74,7 @@ if ('development' == app.get('env')) {
 //TODO: the Access-Control is not working -> have to check it
 app.all('*', function(req, res, next){
   	//res.header("Access-Control-Allow-Origin", "https://pbxltest.zendesk.com");
-  	//res.header("Access-Control-Allow-Origin", "https://ap.salesforce.com");
+  	res.header("Access-Control-Allow-Origin", "https://ap.salesforce.com");
   	res.header("Access-Control-Allow-Origin", "*");
   	res.header("Access-Control-Allow-Headers", "X-Requested-With, Access-Control-Allow-Credentials, Authorization");
   	res.header("Access-Control-Allow-Credentials", true);
@@ -465,7 +465,7 @@ startHeartbeat = function(){
 		var req = http.request(options, function(res) {
 			if(res.statusCode != 200){//some problems happened with the channel. Open a new one
 				log.error("<- response from BW on heartbeat: " + res.statusCode + '\r\n');
-				requestChannel();
+				//requestChannel();
 			}
 		  	log.info("<- response from BW on heartbeat: " + res.statusCode + '\r\n');
 		});
@@ -477,8 +477,8 @@ startHeartbeat = function(){
 		req.end();
 		log.info('-> PUT ' + BW_URL + '/com.broadsoft.xsi-events/v2.0/channel/' + bwconnection.channelId + "/heartbeat \r\n");
 	}else{
-		console.log("WARNING: now heartbeat sent as there is no channel openned");
-		log.warning("WARNING: now heartbeat sent as there is no channel openned");
+		console.log("WARNING: no heartbeat sent to BW as there is no channel openned");
+		log.warning("WARNING: no heartbeat sent to BW as there is no channel openned");
 	}
 };
 
@@ -914,7 +914,7 @@ makeCall = function(destination, username){
 	}
 	var options = {
 	  host: BW_URL,
-	  path: "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/new?address=" + encodeURIComponent(destination),
+	  path: "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/new?address=" + encodeURIComponent(destination) + "&location=all",
 	  method: 'POST',
 	  auth: username + ":" + password
 	};
@@ -927,7 +927,7 @@ makeCall = function(destination, username){
 	});
 
 	req.end();
-	log.info('-> POST ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/new?address=" + encodeURIComponent(destination) + '\r\n');
+	log.info('-> POST ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/new?address=" + encodeURIComponent(destination) +  + "&location=all" + '\r\n');
 };
 
 disconnectCall = function(username, callid){
