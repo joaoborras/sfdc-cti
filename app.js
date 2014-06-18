@@ -34,7 +34,6 @@ var HEARTBEAT_INTERVAL = 15000;
 var CHANNEL_UPDATE_INTERVAL = 1800000;
 var SUBSCRIPTION_UPDATE_INTERVAL = 1600000;
 var BW_URL = 'xsp1.pbxl.net';
-var ZD_URL = 'pbxltest.zendesk.com';
 var SUBSCRIPTION_CLOSE = '</Subscription>';
 var EVENT_CLOSE = '</xsi:Event>';
 var CHANNEL_CLOSE = '</Channel>';
