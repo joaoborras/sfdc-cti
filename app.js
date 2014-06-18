@@ -15,8 +15,8 @@ var shuttingdown = false;
 //as there is only one channel and subscription, that will receive all events from BW related to 
 //all opened calls
 var bwconnection = {
-	applicationId: 'broadsoft4sfdclocal',
-	channelSetId: 'broadsoft4sfdclocalchannelset',
+	applicationId: 'sfdccti_pbxltest',
+	channelSetId: 'sfdccti_pbxltest_channelset',
 	channelId: '',
 	heartbeatIntervalId: '',
 	channelUpdateIntervalId: '',
@@ -61,7 +61,9 @@ app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 
-app.use(express.static(path.join(__dirname, 'public')));
+//app.use(express.static(path.join(__dirname, 'public')));
+var oneDay = 86400000;
+app.use(express.static(__dirname + '/public', { maxAge: oneDay }));
 
 app.use(app.router);
 
