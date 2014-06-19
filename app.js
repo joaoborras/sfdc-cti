@@ -838,11 +838,11 @@ parseChunk = function(chunk){ //chunk is already string
 				for(var index in credentials){
 					if(credentials[index].username === targetid){
 						var responseobj = credentials[index].appId;
-						var callredirectedXml = '<Event>';
-						callredirectedXml += '<eventtype>CallRetrievedEvent</eventtype>';
-						callredirectedXml += '</Event>';
+						var callretrievedXml = '<Event>';
+						callretrievedXml += '<eventtype>CallRetrievedEvent</eventtype>';
+						callretrievedXml += '</Event>';
 						try{
-							responseobj.write(callredirectedXml);
+							responseobj.write(callretrievedXml);
 							log.info("CallRetrievedEvent -> SFDC(" + targetid + ")");
 							console.log("INFO: CallRetrievedEvent -> SFDC");
 						}catch(error)
@@ -856,6 +856,29 @@ parseChunk = function(chunk){ //chunk is already string
 				break;
 			case 'CallUpdatedEvent':
 				console.log("<- INFO: CallUpdatedEvent");
+				var callid = xmldoc.getElementsByTagName('xsi:callId').item(0).firstChild.nodeValue;
+				var personality = xmldoc.getElementsByTagName('xsi:personality').item(0).firstChild.nodeValue;
+				if(personality == 'Click-to-Dial'){
+					var callupdatedXml = '<Event>';
+					callupdatedXml += '<eventtype>CallUpdatedEvent</eventtype>';
+					console.log("personality is Click-to-Dial");
+					try{
+						if(xmldoc.getElementsByTagName('xsi:allowAnswer')){
+							console.log('supports allowanser');
+							callupdatedXml += '<allowAnswer/>';
+						}
+					}catch(error){
+						console.log('does not support allowanser');
+					}
+					callupdatedXml += '</Event>';
+					for(var index in credentials){
+						if(credentials[index].username == targetid){
+							var responseobj = credentials[index].appId;
+							credentials[index].callhalf = callid;
+							responseobj.write(callupdatedXml);
+						}
+					}			
+				}
 				break;
 			case 'CallSubscriptionEvent':
 				console.log("<- INFO: CallSubscriptionEvent");

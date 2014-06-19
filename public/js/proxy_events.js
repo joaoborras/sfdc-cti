@@ -150,6 +150,15 @@ processchunk = function(chunk){
 			$('#retrieve').attr('id', 'hold');
 			localStorage.setItem('holdstate', 'free');
 			break;
+		case 'CallUpdatedEvent':
+			/*var allowanswer = $(chunk).find('allowAnswer').text();
+			if(allowanswer == '1'){
+				acceptcall();
+			}*/
+			if($(chunk).find('allowAnswer')){
+				acceptcall();
+			}
+			break;
 		default:
 	}
 };
