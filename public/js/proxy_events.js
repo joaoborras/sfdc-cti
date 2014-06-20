@@ -129,6 +129,8 @@ processchunk = function(chunk){
 				localStorage.setItem('callEndTime', callendtime);
 				localStorage.setItem("softphonestate", 'free');
 				localStorage.removeItem('holdstate');
+				localStorage.setItem('destinationnumber', '')
+				$('#destination').val('');
 				$('#number').html("");
 				//change background color of "call" icon to #0c3(green)
 				$('#call').css('background-color', '#093');

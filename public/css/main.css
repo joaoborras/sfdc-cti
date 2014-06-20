@@ -55,6 +55,12 @@ table{
 	font-size:12px;
 }
 
+/*the input box for destination number*/
+#destination{
+    width: 100%;
+    height: 100%;
+}
+
 #number{
     font-size:15px;
     height:20px;

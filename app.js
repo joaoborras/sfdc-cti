@@ -160,6 +160,7 @@ app.all("/log_out/", function(req, res){
 	for(var index in credentials){
 		if(credentials[index].username === req.param('username')){
 			console.log("found user " + req.param('username') + " in credentials and will now delete it");
+			res.status(200);
 			var responseobj = credentials[index].appId;
 			var logoutresponse = '<Event>';
 			logoutresponse += '<eventtype>LogOutResponse</eventtype>';
@@ -167,13 +168,14 @@ app.all("/log_out/", function(req, res){
 			responseobj.write(logoutresponse);
 			credentials.splice(index, 1);
 			break;
+		}else{
+			res.status(404);
 		}
 	}
 	console.log('Logged in users: ' + '\r\n');
 	for(var x in credentials){
 		console.log('Username: ' + credentials[x].username + '\r\n');
 	}
-	res.status(200);
 	res.send();
 });
 

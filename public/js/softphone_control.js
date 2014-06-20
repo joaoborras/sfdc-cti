@@ -45,23 +45,31 @@ $('document').ready(function(){
     }else{
         $('#takenotesform').css('display', 'none');
     }
+
+    //this is to maintain the status of the destination input field
+    $('#destination').val(localStorage.getItem('destinationnumber'));
 });
 
 $('.digit').click(function(){
     var number = $(this).html();
-    $('#number').append(number);
+    //$('#number').append(number);
+    appenddestination(number);
+    $('#destination').val(localStorage.getItem('destinationnumber'));
 });
 
-//$('keyup')
-
 $('#clear').click(function(){
-    $('#number').empty();
+    //$('#number').empty();
+    localStorage.setItem('destinationnumber', '');
+    $('#destination').val(localStorage.getItem('destinationnumber'));
 });
 
 $('#delete').click(function(){
-    var text = $('#number').text();
+    //var text = $('#number').text();
+    var text = $('#destination').val();
     text = text.slice(0, text.length-1);
-    $('#number').html(text);
+    //$('#number').html(text);
+    localStorage.setItem('destinationnumber', text);
+    $('#destination').val(localStorage.getItem('destinationnumber'));
 });
 
 $('#show_hidedialpad').click(function(){
@@ -273,12 +281,27 @@ $('#notes').click(function(){
 
 $( "#duedatepicker" ).datepicker({ dateFormat: "yy-mm-dd" });
 
+$('#destination').keyup(function(e){
+    if (e.keyCode == 13){
+        $('#call').click();
+    }
+});
+
 $('#call').click(function(){
     event.preventDefault();
     var state = localStorage.getItem("softphonestate");
     switch(state){
         case 'free':
-            makecall($('#number').text());
+            //makecall($('#number').text());
+            var destination = $('#destination').val();
+            if(validatenumber(destination)){
+                localStorage.setItem('destinationnumber', destination);
+                makecall(destination);
+            }else{
+                alert('Destination number with wrong format');
+                localStorage.setItem('destinationnumber', '');
+                $('#destination').val('');
+            }
             break;
         case 'busy':
             disconnectcall(localStorage.getItem('callId'));
@@ -320,6 +343,21 @@ $('#declinecall').click(function(){
 });
 
 //auxiliary functions from here
+validatenumber = function(number){
+    var regexp = /([0-9]{4})|(((0[7-9]0)|(0[1-9]))(-)?([0-9]{4})(-)?([0-9]{4}))/;
+    if(regexp.test(number)){
+        return true;
+    }else{
+        return false;
+    }
+};
+
+appenddestination = function(digit){
+    var dest = localStorage.getItem('destinationnumber');
+    dest = dest + digit;
+    localStorage.setItem('destinationnumber', dest);
+};
+
 saveCallLog = function (response) {
     var result = JSON.parse(response.result);
     localStorage.setItem('resultobjectid', result.objectId);

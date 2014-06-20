@@ -20,6 +20,7 @@ bwlogin = function(username, password){
 			localStorage.setItem("loggedin", true);
 			localStorage.setItem('username', username);
 			localStorage.setItem('softphonestate', 'free');
+			localStorage.setItem('destinationnumber', '');
 			$('#call').css('background-color', '#093');
 			connect(username);
 			$('#loggeduser').text(localStorage.getItem(('username')));
