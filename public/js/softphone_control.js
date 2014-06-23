@@ -315,7 +315,22 @@ $('#call').click(function(){
 
 $('#transfer').click(function(){
     event.preventDefault();
-    getUserDir();
+    //getUserDir(); -> this should be called when the HeldEvent is received and the state is
+    //transferring
+    var softphonestate = localStorage.getItem('softphonestate');
+    switch(softphonestate){
+        case 'transferring':
+            consultTransfer();
+            break;
+        case 'held':
+            retrieveCall(localStorage.getItem('callId'));
+            break;
+        case 'busy':
+            localStorage.setItem('softphonestate', 'transferring');
+            holdCall(localStorage.getItem('callId'));
+            break;
+        default:
+    }
 });
 
 $('#hold').click(function(){
@@ -403,10 +418,8 @@ pulseCallButton = function(){
 
 releaseLocalStorage = function(){
     localStorage.removeItem('callEndTime');
-    localStorage.removeItem('callLogSubject');
     localStorage.removeItem('callNumber');
     localStorage.removeItem('callStartTime');
-    localStorage.removeItem('calledtype');
     localStorage.removeItem('callingParty');
 
 };

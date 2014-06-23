@@ -15,8 +15,8 @@ var shuttingdown = false;
 //as there is only one channel and subscription, that will receive all events from BW related to 
 //all opened calls
 var bwconnection = {
-	applicationId: 'sfdccti_pbxltest',
-	channelSetId: 'sfdccti_pbxltest_channelset',
+	applicationId: 'sfdccti_pbxltest_local',
+	channelSetId: 'sfdccti_pbxltest_local_channelset',
 	channelId: '',
 	heartbeatIntervalId: '',
 	channelUpdateIntervalId: '',
@@ -251,6 +251,14 @@ app.all('/transfer_call/', function(req, res){
 	res.writeHead(200, {'Content-Type': 'text/plain'});
 	res.send();
 	transferCall(req.param('username'), req.param('destination')); //TODO: implement rejectCall();
+});
+
+app.all('/consult_transfer_call/', function(req, res){
+	console.log("/consult_transfer_call/ received" + req.query);
+	log.info('<- /consult_transfer_call/ from: ' + req.param('username') + ' to: ' + req.param('destination'));
+	res.writeHead(200, {'Content-Type': 'text/plain'});
+	res.send();
+	consultTransferCall(req.param('username'), req.param('callid1'), req.param('callid2')); //TODO: implement rejectCall();
 });
 
 app.all('/hold_call/', function(req, res){
@@ -882,11 +890,29 @@ parseChunk = function(chunk){ //chunk is already string
 					}			
 				}
 				break;
-			case 'CallSubscriptionEvent':
-				console.log("<- INFO: CallSubscriptionEvent");
-				break;
 			case 'CallTransferredEvent':
 				console.log('<- INFO: CallTransferredEvent');
+				for(var index in credentials){
+					if(credentials[index].username === targetid){
+						var responseobj = credentials[index].appId;
+						var calltransferreddXml = '<Event>';
+						calltransferreddXml += '<eventtype>CallTransferredEvent</eventtype>';
+						calltransferreddXml += '</Event>';
+						try{
+							responseobj.write(calltransferreddXml);
+							log.info("CallTransferredEvent -> SFDC(" + targetid + ")");
+							console.log("INFO: CallTransferredEvent -> SFDC");
+						}catch(error)
+						{
+							console.log("ERROR: Cannot send CallTransferredEvent -> SFDC(no http session)");
+							log.info("ERROR: Cannot send CallTransferredEvent -> SFDC(no http session)");
+						}
+						break;
+					}
+				}
+				break;
+			case 'CallSubscriptionEvent':
+				console.log("<- INFO: CallSubscriptionEvent");
 				break;
 			case 'DoNotDisturbEvent':
 			case 'CallForwardingAlwaysEvent':
@@ -1016,6 +1042,35 @@ transferCall = function(username, destination){
 
 	req.end();
 	log.info('-> PUT ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callhalf + "BlindTransfer&=" + destination + '\r\n');
+};
+
+consultTransferCall = function(username, callid1, callid2){
+	console.log("-> consultTransferCall");
+	var password;
+	for(var i in credentials){
+		if(credentials[i].username === username){
+			password = credentials[i].password;
+		}
+	}
+	var options = {
+	  host: BW_URL,
+	  path: "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callid1 + "/ConsultTransfer/" + callid2,
+	  method: 'PUT',
+	  auth: username + ":" + password
+	};
+	var http = require('http');
+	var req = http.request(options, function(res) {
+	  if(res.statusCode != 200){
+			log.error("<- response from BW: " + res.statusCode + '\r\n');
+		}
+	});
+
+	req.on('error', function(e) {
+  		log.info('problem with ConsultTransfer PUT: ' + e.message + '\r\n');
+	});
+
+	req.end();
+	log.info('-> PUT ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/calls/" + callid1 + "/ConsultTransfer/" + callid2 + '\r\n');
 };
 
 declineCall = function(username, callid){

@@ -97,8 +97,6 @@ makecall = function(destination){
 		success:function(result){
 			$('#number').html("Calling " + destination);
            	localStorage.setItem('callNumber', destination);
-			localStorage.setItem('calledtype', "outbound");
-			localStorage.setItem('callLogSubject', 'Call On');
 		},
 		error:function(xhr, status, result){
 			console.log("Status: " + status + "; result: " + result);
@@ -109,7 +107,8 @@ makecall = function(destination){
 transferCall = function(){
 	var destination = $('#extensioninput').val();
 	var username = localStorage.getItem("username");
-	$.ajax({url: "/transfer_call/?username=" + username + "&destination=" + destination, 
+	//$.ajax({url: "/transfer_call/?username=" + username + "&destination=" + destination, 
+	$.ajax({url: "/make_call/?username=" + username + "&destination=" + destination,
 		cache: false,
 		success:function(result){
 			
@@ -119,6 +118,21 @@ transferCall = function(){
 		}
 	});
 };
+
+consultTransfer = function(){
+	var username = localStorage.getItem("username");
+	var callid1 = localStorage.getItem('callId');
+	var callid2 = localStorage.getItem('callId2');
+	$.ajax({url: "/consult_transfer_call/?username=" + username + "&callid1=" + callid1 + "&callid2=" + callid2,
+		cache: false,
+		success:function(result){
+			
+		},
+		error:function(xhr, status, result){
+			console.log("Status: " + status + "; result: " + result);
+		}
+	});
+}
 
 holdCall = function(callid){
 	console.log("holdCall called");

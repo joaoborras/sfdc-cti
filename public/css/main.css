@@ -150,7 +150,7 @@ sup, #show_hidedialpad, .userdirectory{
 #extras{
     float:right;
 }
-#retrieve{
+#retrieve, #transferring{
     font-size:10px;
     height:10px;
     background:red;
