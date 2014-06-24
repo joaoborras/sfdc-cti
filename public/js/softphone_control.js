@@ -292,7 +292,7 @@ $('#call').click(function(){
     var state = localStorage.getItem("softphonestate");
     switch(state){
         case 'free':
-            //makecall($('#number').text());
+        case 'transferring':
             var destination = $('#destination').val();
             if(validatenumber(destination)){
                 localStorage.setItem('destinationnumber', destination);

@@ -156,7 +156,7 @@ sup, #show_hidedialpad, .userdirectory{
     background:red;
 }
 /*related to the softphone modal form */
-a#credentials, a#signout, a#bwcredentials, a#signin, a#notes{
+a#credentials, a#signout, a#bwcredentials, a#signin, a#notes, a#callhistory{
    text-decoration:underline;
    cursor:pointer;
    color: black;
