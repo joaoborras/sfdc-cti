@@ -176,18 +176,21 @@
 			<div>
 				{{#each logentry}}
 					<p class='callhistory'>{{this.calledNumber}}</p>
+					<p class='callhistory'>{{this.placedCallstartTime}}, {{this.placedCallcallDuration}}</p>
 				{{/each}}
 			</div>
 			<h3>Received Calls</h3>
 			<div>
 				{{#each logentry}}
 					<p class='callhistory'>{{this.callingNumber}}</p>
+					<p class='callhistory'>{{this.receivedCallstartTime}}, {{this.receivedCallcallDuration}}</p>
 				{{/each}}
 			</div>
 			<h3>Missed Calls</h3>
 			<div>
 				{{#each logentry}}
 					<p class='callhistory'>{{this.missedNumber}}</p>
+					<p class='callhistory'>{{this.missedCallstartTime}}</p>
 				{{/each}}
 			</div>
 		</div>

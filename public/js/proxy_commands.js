@@ -208,6 +208,8 @@ getUserCallHistory = function(){
 			var missed = xmldoc.getElementsByTagName('missed').item(0).childNodes.length;
 			var maxvalue = Math.max(placed, received, missed);
 			var nodename, callednumber, callingnumber, missednumber;
+			var placedcallstarttime, answertime, releasetime, placedcallcallduration,
+				receivedcallstarttime, receivedcallcallduration, missedcallstarttime;
 
 			for(var x=0; x<=maxvalue-1;x++){
 				if(x<=placed){
@@ -215,10 +217,15 @@ getUserCallHistory = function(){
 						nodename = xmldoc.getElementsByTagName('placed').item(0).childNodes[x].nextSibling.childNodes[4].nodeName;
 						if(nodename == 'dialedNumber'){
 							callednumber = xmldoc.getElementsByTagName('placed').item(0).childNodes[x].nextSibling.childNodes[4].childNodes[0].nodeValue;
+							placedcallstarttime = new Date(+xmldoc.getElementsByTagName('placed').item(0).childNodes[x].nextSibling.childNodes[17].childNodes[0].nodeValue);
+							answertime = xmldoc.getElementsByTagName('placed').item(0).childNodes[x].nextSibling.childNodes[18].childNodes[0].nodeValue;
+							releasetime = xmldoc.getElementsByTagName('placed').item(0).childNodes[x].nextSibling.childNodes[19].childNodes[0].nodeValue;
+							placedcallcallduration = '';
 						}
 					}catch(error){}
 				}else{
 					callednumber = '';
+					placedcallstarttime = '';
 				}
 
 				if(x<=received){
@@ -226,11 +233,16 @@ getUserCallHistory = function(){
 						nodename = xmldoc.getElementsByTagName('received').item(0).childNodes[x].nextSibling.childNodes[4].nodeName;
 						if(nodename == 'callingPresentationNumber'){
 							var callingnumber = xmldoc.getElementsByTagName('received').item(0).childNodes[x].nextSibling.childNodes[4].childNodes[0].nodeValue;
+							receivedcallstarttime = new Date(+xmldoc.getElementsByTagName('received').item(0).childNodes[x].nextSibling.childNodes[14].childNodes[0].nodeValue);
+							answertime = xmldoc.getElementsByTagName('received').item(0).childNodes[x].nextSibling.childNodes[15].childNodes[0].nodeValue;
+							releasetime = xmldoc.getElementsByTagName('received').item(0).childNodes[x].nextSibling.childNodes[16].childNodes[0].nodeValue;
+							receivedcallcallduration = '';
 						}
 					}catch(error){}
 				}
 				else{
 					callingnumber = '';
+					receivedcallstarttime = '';
 				}
 
 				if(x<=missed){
@@ -238,17 +250,24 @@ getUserCallHistory = function(){
 						nodename = xmldoc.getElementsByTagName('missed').item(0).childNodes[x].nextSibling.childNodes[4].nodeName;
 						if(nodename == 'callingPresentationNumber'){
 							var missednumber = xmldoc.getElementsByTagName('missed').item(0).childNodes[x].nextSibling.childNodes[4].childNodes[0].nodeValue;
+							missedcallstarttime = new Date(+xmldoc.getElementsByTagName('missed').item(0).childNodes[x].nextSibling.childNodes[12].childNodes[0].nodeValue);
 						}
 					}catch(error){}
 				}
 				else{
 					missednumber = '';
+					missedcallstarttime = '';
 				}
 
 				callhistory.logentry.push({
 					calledNumber: callednumber,
 					callingNumber: callingnumber,
 					missedNumber: missednumber,
+					placedCallstartTime: placedcallstarttime,
+					placedCallcallDuration: placedcallcallduration,
+					receivedCallstartTime: receivedcallstarttime,
+					receivedCallcallDuration: receivedcallcallduration,
+					missedCallstartTime: missedcallstarttime,
 				});
 			}
 			html = template(callhistory);
