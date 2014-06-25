@@ -240,6 +240,26 @@ $( "#settings-modal-menu" ).dialog({
 });
 //until here setting modal dialog
 
+//call history modal form
+$( "#callhistory-modal-form" ).dialog({
+    autoOpen: false,
+    modal: true,
+    width: 150,
+    height: 250,
+    resizable: true,
+    title: "Call History",
+    buttons: [
+        {
+            text: "Close",
+            click: function(){
+                $( "#callhistory-modal-form" ).dialog('close');
+            },
+            style: "position: relative; left: 0%",
+        },
+    ]
+});
+//until here call history modal form
+
 $('#show_hidesettings').click(function(){
     event.preventDefault();
     $("#settings-modal-menu").dialog('open');
@@ -277,6 +297,10 @@ $('#notes').click(function(){
     $('#takenotesform').css('display', 'inline');
     localStorage.setItem('takingnotes', 'true');
     $("#settings-modal-menu").dialog('close');
+});
+
+$('#callhistory').click(function(){
+    getUserCallHistory();
 });
 
 $( "#duedatepicker" ).datepicker({ dateFormat: "yy-mm-dd" });

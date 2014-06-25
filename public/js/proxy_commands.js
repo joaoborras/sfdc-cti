@@ -192,4 +192,71 @@ getUserDir = function(){
 		},
 	});
 };
+
+getUserCallHistory = function(){
+	var source = $('#callhistory-entry-template').html();
+	var template = Handlebars.compile(source);
+	var html;
+	var username = 'BWS_Test.zentestuser1@pbxl.net';
+	$.ajax({url: "https://localhost:3000/get_callhistoryforuser/?username=" + username + "&calllogtype=EnhancedCallLogs", 
+		success:function(result){
+			var callhistory = {logentry: []};
+			var parser = new DOMParser();
+			var xmldoc = parser.parseFromString(result, "text/xml");
+			var placed = xmldoc.getElementsByTagName('placed').item(0).childNodes.length;
+			var received = xmldoc.getElementsByTagName('received').item(0).childNodes.length;
+			var missed = xmldoc.getElementsByTagName('missed').item(0).childNodes.length;
+			var maxvalue = Math.max(placed, received, missed);
+			var nodename, callednumber, callingnumber, missednumber;
+
+			for(var x=0; x<=maxvalue-1;x++){
+				if(x<=placed){
+					try{
+						nodename = xmldoc.getElementsByTagName('placed').item(0).childNodes[x].nextSibling.childNodes[4].nodeName;
+						if(nodename == 'dialedNumber'){
+							callednumber = xmldoc.getElementsByTagName('placed').item(0).childNodes[x].nextSibling.childNodes[4].childNodes[0].nodeValue;
+						}
+					}catch(error){}
+				}else{
+					callednumber = '';
+				}
+
+				if(x<=received){
+					try{
+						nodename = xmldoc.getElementsByTagName('received').item(0).childNodes[x].nextSibling.childNodes[4].nodeName;
+						if(nodename == 'callingPresentationNumber'){
+							var callingnumber = xmldoc.getElementsByTagName('received').item(0).childNodes[x].nextSibling.childNodes[4].childNodes[0].nodeValue;
+						}
+					}catch(error){}
+				}
+				else{
+					callingnumber = '';
+				}
+
+				if(x<=missed){
+					try{
+						nodename = xmldoc.getElementsByTagName('missed').item(0).childNodes[x].nextSibling.childNodes[4].nodeName;
+						if(nodename == 'callingPresentationNumber'){
+							var missednumber = xmldoc.getElementsByTagName('missed').item(0).childNodes[x].nextSibling.childNodes[4].childNodes[0].nodeValue;
+						}
+					}catch(error){}
+				}
+				else{
+					missednumber = '';
+				}
+
+				callhistory.logentry.push({
+					calledNumber: callednumber,
+					callingNumber: callingnumber,
+					missedNumber: missednumber,
+				});
+			}
+			html = template(callhistory);
+				$('#usercalllog').html(html);
+			$('#entry-accordion').accordion({
+				collapsible: true
+			});
+		},
+	});
+};
 //Until here

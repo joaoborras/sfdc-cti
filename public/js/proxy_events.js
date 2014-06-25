@@ -116,6 +116,7 @@ processchunk = function(chunk){
 				case 'transferring':
 					break;
 				case 'incomingcall':
+				case 'outgoingcall':
 					console.log("<- CallAnsweredEvent");
 					var callstarttime = new Date().getTime();
 					localStorage.setItem('callStartTime', callstarttime);

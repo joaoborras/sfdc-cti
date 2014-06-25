@@ -181,3 +181,13 @@ fieldset {
 .ui-dialog-buttonpane{
     font-size: 10px;
 }
+/*style for the call history form*/
+#entry-accordion{
+  font-size: 10px;
+}
+#callhistory{
+  border-collapse: collapse;
+  border-left-style:hidden;
+  border-right-style:hidden;
+  font-size: 10px;
+}

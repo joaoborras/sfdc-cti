@@ -100,6 +100,12 @@ app.all('/get_directoryforuser/', function(req, res){
 	getDirectoryForUser(res, req.param('username'));
  });
 
+app.all('/get_callhistoryforuser/', function(req, res){
+  	console.log("/get_callhistoryforuser/ received " + req.query);
+  	log.info('<- /get_callhistoryforuser/ from: ' + req.param('username'));
+	getCallHistoryForUser(res, req.param('username'), req.param('calllogtype'));
+ });
+
 app.all('/heartbeat/', function(req, res){
 	var username = req.param('username');
 	console.log("<- /heartbeat/ received from " + username);
@@ -327,7 +333,7 @@ getDirectoryForUser = function(response, username){
 	var http = require('http');
 	var req = http.request(options, function(res) {
 		if(res.statusCode != 200){
-			log.error("<- response from BW for verifyUser: " + res.statusCode + '\r\n');
+			log.error("<- response from BW for getDirectoryUser: " + res.statusCode + '\r\n');
 		}
 	  res.setEncoding('utf8');
 	  var resbody = "";
@@ -347,6 +353,44 @@ getDirectoryForUser = function(response, username){
 	req.end();
 	log.info('-> GET ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/directories/Group \r\n");
 };
+
+getCallHistoryForUser = function(response, username, calllogtype){
+	var password;
+	for(var x in credentials){
+		if(credentials[x].username == username){
+			password = credentials[x].password;
+			break;
+		}
+	}
+	var options = {
+	  host: BW_URL,
+	  path: "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/directories/" + calllogtype,
+	  method: 'GET',
+	  auth: username + ':' + password
+	};
+	var http = require('http');
+	var req = http.request(options, function(res) {
+		if(res.statusCode != 200){
+			log.error("<- response from BW for getCallHistoryForUser: " + res.statusCode + '\r\n');
+		}
+	  res.setEncoding('utf8');
+	  var resbody = "";
+	  res.on('data', function(chunk){
+	  	resbody += chunk;
+	  	if(resbody.indexOf('</'+ calllogtype + '>') >= 0){
+	  		response.send(resbody);
+	  		resbody = "";
+	  	}
+	  });
+	});
+
+	req.on('error', function(e) {
+  		log.info('problem with request: ' + e.message + '\r\n');
+	});
+
+	req.end();
+	log.info('-> GET ' + BW_URL + "/com.broadsoft.xsi-actions/v2.0/user/" + username + "/directories/" + calllogtype + "\r\n");
+}
 
 requestChannel = function(){
 	console.log("-> INFO: requestChannel");

@@ -135,7 +135,11 @@
 	</div>
 	<!-- until here the Call Transfer modal form -->
 
-	<!-- settings modal -->
+	<!-- call history div -->
+	<div id='usercalllog'></div>
+	<!-- until here call history div -->
+
+	<!-- settings modal form -->
 	<div id='settings-modal-menu'>
 		<p>Status: <span id='settings_status'></span></p>
 		<a id="signin">Sign In</a><br/>
@@ -144,7 +148,7 @@
 		<hr>
 		<a id="signout">Sign Out</a><br/>
 	</div>
-	<!-- until here settings accordion -->
+	<!-- until here settings modal form -->
 
 	<div id="dialog_mainhttp_disconnection" title="Disconnected from the server!">
   		<p>
@@ -164,6 +168,31 @@
 		</div>
 	</script>
 	<!--until here handlebars template -->
+
+	<!-- this is the handlebars template for call history -->
+	<script id="callhistory-entry-template" type="text/x-handlebars-template">
+		<div id="entry-accordion">
+			<h3>Placed Calls</h3>
+			<div>
+				{{#each logentry}}
+					<p class='callhistory'>{{this.calledNumber}}</p>
+				{{/each}}
+			</div>
+			<h3>Received Calls</h3>
+			<div>
+				{{#each logentry}}
+					<p class='callhistory'>{{this.callingNumber}}</p>
+				{{/each}}
+			</div>
+			<h3>Missed Calls</h3>
+			<div>
+				{{#each logentry}}
+					<p class='callhistory'>{{this.missedNumber}}</p>
+				{{/each}}
+			</div>
+		</div>
+	</script>
+	<!-- until here handlebars template -->
 
 	<!-- script src="js/main.js"></script -->
 	<script src="js/softphone_control.js"></script>
