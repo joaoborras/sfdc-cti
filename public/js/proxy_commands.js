@@ -272,9 +272,11 @@ getUserCallHistory = function(){
 			}
 			html = template(callhistory);
 				$('#usercalllog').html(html);
-			$('#entry-accordion').accordion({
+				$('#usercalllog').css('display', '');
+				$('#entry-accordion').accordion({
 				collapsible: true
 			});
+				localStorage.setItem('callhistory', 'open');
 		},
 	});
 };

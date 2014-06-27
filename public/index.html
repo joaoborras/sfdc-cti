@@ -57,14 +57,16 @@
 	<div id="buttons">
 	<table>
 	    <tr>
+	        <td id='history'><img src="images/history.png" width="18" alt="history"></td>
+	        <td id='address'><img src="images/address.png" width="16" alt="address book"></td>
 	        <td id='clear'><img src="images/clear.png" width="15" alt="clear"></td>
 	        <td id='delete'><img src="images/delete.png" width="17" alt="delete"></td>
-	        <td id='call' class='pulse'><img src="images/call.png" width="18" alt="call"></td>
 	    </tr>
 	    <tr>
+	        <td id="show_hidedialpad"><img src="images/dialpad.png" width="18" alt="show dialpad"></td>
 	        <td id='hold'><img src="images/hold.png" width="22" alt="hold"></td>
 	        <td id='transfer'><img src="images/transfer.png" width="30" alt="transfer"></td>
-	        <td id="show_hidedialpad"><img src="images/dialpad.png" width="18" alt="show dialpad"></td>
+	        <td id='call' class='pulse'><img src="images/call.png" width="18" alt="call"></td>
 	    </tr>
 	</table>
     </div>
@@ -142,10 +144,9 @@
 	<!-- settings modal form -->
 	<div id='settings-modal-menu'>
 		<p>Status: <span id='settings_status'></span></p>
-		<a id="signin">Sign In</a><br/>
 		<a id="notes">Notes</a><br/>
-		<a id="callhistory">Call History</a>
 		<hr>
+		<a id="signin">Sign In</a><br/>
 		<a id="signout">Sign Out</a><br/>
 	</div>
 	<!-- until here settings modal form -->
@@ -176,21 +177,18 @@
 			<div>
 				{{#each logentry}}
 					<p class='callhistory'>{{this.calledNumber}}</p>
-					<p class='callhistory'>{{this.placedCallstartTime}}, {{this.placedCallcallDuration}}</p>
 				{{/each}}
 			</div>
 			<h3>Received Calls</h3>
 			<div>
 				{{#each logentry}}
 					<p class='callhistory'>{{this.callingNumber}}</p>
-					<p class='callhistory'>{{this.receivedCallstartTime}}, {{this.receivedCallcallDuration}}</p>
 				{{/each}}
 			</div>
 			<h3>Missed Calls</h3>
 			<div>
 				{{#each logentry}}
 					<p class='callhistory'>{{this.missedNumber}}</p>
-					<p class='callhistory'>{{this.missedCallstartTime}}</p>
 				{{/each}}
 			</div>
 		</div>

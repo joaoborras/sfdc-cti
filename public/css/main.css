@@ -121,7 +121,6 @@ sup, #show_hidedialpad, .userdirectory{
 }
 #buttons td{
     color:#FFF;
-    height:25px;
     border-radius: 5px;
 	-ms-border-radius: 5px;
  	-moz-border-radius: 5px;
@@ -132,21 +131,30 @@ sup, #show_hidedialpad, .userdirectory{
 	vertical-align:middle;
 }
 
-.digit, #delete, #call, #hold, #transfer, #show_hidedialpad{
+.digit, #delete, #call, #hold, #transfer, #show_hidedialpad, #address, #history{
     cursor:pointer;
 }
 #call {
     background:#f08229;
 }
-#clear, #delete, #hold, #transfer{
+#clear, #delete, #hold, #transfer, #address, #history, #show_hidedialpad{
     background:#4e5660;
 }
 #dialpad_inactive{
   background: #4e5660;
 }
+
 #dialpad_active{
-  background: #0000CD;
+  /*background: #8b95a2;*/
+  background: blue;
 }
+
+/*hover effect*/
+#dialpad td:hover , #buttons td:hover {
+    opacity: 0.8;
+    filter: alpha(opacity=80);
+}
+
 #extras{
     float:right;
 }
