@@ -107,7 +107,6 @@ makecall = function(destination){
 transferCall = function(){
 	var destination = $('#extensioninput').val();
 	var username = localStorage.getItem("username");
-	//$.ajax({url: "/transfer_call/?username=" + username + "&destination=" + destination, 
 	$.ajax({url: "/make_call/?username=" + username + "&destination=" + destination,
 		cache: false,
 		success:function(result){

@@ -88,7 +88,7 @@ processchunk = function(chunk){
 				localStorage.setItem('callingParty', callerid);
 				localStorage.setItem('callId', callid);
 				localStorage.setItem("softphonestate", 'incomingcall');
-				localStorage.setItem('holdstate', 'free');
+				//localStorage.setItem('holdstate', 'free');
 				identifyCaller(callerid);
 				//sforce.interaction.searchAndScreenPop(callerid,'','inbound');
 				pulseCallButton();
@@ -97,23 +97,29 @@ processchunk = function(chunk){
 			}
 			break;
 		case 'CallOriginatedEvent':
-			if(localStorage.getItem('softphonestate') == 'transferring'){
-				var callid2 = $(chunk).find('callid').text();
-				localStorage.setItem('callId2', callid2);
-			}else{
-				var callid = $(chunk).find('callid').text();
-				var callingid = $(chunk).find('callingid').text();
-				console.log("<- CallOriginatedEvent(callid: " + callid + ")");
-				localStorage.setItem('callNumber', callingid);
-				localStorage.setItem('callId', callid);
-				localStorage.setItem("softphonestate", 'outgoingcall');
-				localStorage.setItem('holdstate', 'free');
-				$('#number').html('Call To: ' + callingid);
+			switch(localStorage.getItem('softphonestate')){
+				case 'free':
+					var callid = $(chunk).find('callid').text();
+					var callingid = $(chunk).find('callingid').text();
+					console.log("<- CallOriginatedEvent(callid: " + callid + ")");
+					localStorage.setItem('callNumber', callingid);
+					localStorage.setItem('callId', callid);
+					localStorage.setItem("softphonestate", 'outgoingcall');
+					//localStorage.setItem('holdstate', 'free');
+					$('#number').html('Call To: ' + callingid);
+					break;
+				case 'transferring_free':
+					var callid2 = $(chunk).find('callid').text();
+					localStorage.setItem('callId2', callid2);
+					localStorage.setItem('softphonestate', 'transferring_calling');
+					break;
+				default:
 			}
 			break;
 		case 'CallAnsweredEvent':
 			switch(localStorage.getItem('softphonestate')){
-				case 'transferring':
+				case 'transferring_calling':
+					localStorage.setItem('softphonestate', 'transferring_consulting');
 					break;
 				case 'incomingcall':
 				case 'outgoingcall':
@@ -133,16 +139,17 @@ processchunk = function(chunk){
 			}
 			break;
 		case 'CallReleasedEvent':
+			var callid = $(chunk).find('callid').text();
+			console.log("<- CallReleasedEvent(callid: " + callid + ")");
 			switch(localStorage.getItem('softphonestate')){
 				case 'busy':
-				case 'calltransferred':
-					var callid = $(chunk).find('callid').text();
-					console.log("<- CallReleasedEvent(callid: " + callid + ")");
+				case 'transferring':
+				case 'outgoingcall':
 					if(callid == localStorage.getItem('callId')){
 						var callendtime = new Date().getTime();
 						localStorage.setItem('callEndTime', callendtime);
 						localStorage.setItem("softphonestate", 'free');
-						localStorage.removeItem('holdstate');
+						//localStorage.removeItem('holdstate');
 						localStorage.setItem('destinationnumber', '')
 						$('#destination').val('');
 						$('#number').html("");
@@ -152,22 +159,23 @@ processchunk = function(chunk){
 						//sforce.interaction.getPageInfo(saveCallLog); //save call log in SFDC
 					}
 					break;
-				case 'transferring':
-					localStorage.setItem('softphonestate', 'held');
+				case 'transferring_consulting':
+					localStorage.setItem("softphonestate", 'transferring');
 					break;
 				default:
 			}
 			break;
 		case 'CallRedirectedEvent':
 			switch(localStorage.getItem('softphonestate')){
-				case 'transferring':
+				case 'transferring_consulting':
 					localStorage.setItem('softphonestate', 'calltransferred');
 					var callid = localStorage.getItem('callId');
 					var callendtime = new Date().getTime();
 					localStorage.setItem('callEndTime', callendtime);
 					localStorage.setItem("softphonestate", 'free');
-					localStorage.removeItem('holdstate');
-					localStorage.setItem('destinationnumber', '')
+					//localStorage.removeItem('holdstate');
+					localStorage.setItem('destinationnumber', '');
+					localStorage.removeItem('callid2');
 					$('#destination').val('');
 					$('#number').html("");
 					//change background color of "call" icon to #0c3(green)
@@ -182,23 +190,30 @@ processchunk = function(chunk){
 			}
 			break;
 		case 'CallHeldEvent':
-			if(localStorage.getItem('softphonestate') == 'transferring'){
-				$('#transfer').attr('id', 'transferring');
-				getUserDir();
-			}else{
-				$('#hold').attr('id', 'retrieve');
-				localStorage.setItem('holdstate', 'held');
+			switch(localStorage.getItem('softphonestate')){
+				case 'transferring':
+					$('#transfer').attr('id', 'transferring');
+					localStorage.setItem('softphonestate', 'transferring_free');
+					//getUserDir();
+					break;
+				case 'busy':
+					$('#hold').attr('id', 'retrieve');
+					localStorage.setItem('softphonestate', 'held');
+					break;
+				default:
 			}
 			break;
 		case 'CallRetrievedEvent':
 			switch(localStorage.getItem('softphonestate')){
 				case 'transferring':
+				case 'transferring_free':
 					$('#transferring').attr('id', 'transfer');
-					localStorage.setItem('softphonestate', 'busy')
+					localStorage.setItem('softphonestate', 'busy');
 					break;
 				case 'held':
 					$('#retrieve').attr('id', 'hold');
-					localStorage.setItem('holdstate', 'free');
+					//localStorage.setItem('holdstate', 'free');
+					localStorage.setItem('softphonestate', 'busy');
 					break;
 				default:
 			}

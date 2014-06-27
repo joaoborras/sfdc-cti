@@ -303,7 +303,7 @@ $('#call').click(function(){
     var state = localStorage.getItem("softphonestate");
     switch(state){
         case 'free':
-        case 'transferring':
+        case 'transferring_free':
             var destination = $('#destination').val();
             if(validatenumber(destination)){
                 localStorage.setItem('destinationnumber', destination);
@@ -313,6 +313,9 @@ $('#call').click(function(){
                 localStorage.setItem('destinationnumber', '');
                 $('#destination').val('');
             }
+            break;
+        case 'transferring':
+            localStorage.setItem('softphonestate', 'busy');
             break;
         case 'busy':
             disconnectcall(localStorage.getItem('callId'));
@@ -331,9 +334,13 @@ $('#transfer').click(function(){
     var softphonestate = localStorage.getItem('softphonestate');
     switch(softphonestate){
         case 'transferring':
+            retrieveCall(localStorage.getItem('callId'));
+            break;
+        case 'transferring_consulting':
             consultTransfer();
             break;
         case 'held':
+        case 'transferring_free':
             retrieveCall(localStorage.getItem('callId'));
             break;
         case 'busy':
@@ -351,10 +358,10 @@ $('#address').click(function(){
 
 $('#hold').click(function(){
     event.preventDefault();
-    var holdstate = localStorage.getItem('holdstate');
-    if(holdstate == 'free'){
+    var softphonestate = localStorage.getItem('softphonestate');
+    if(softphonestate == 'busy'){
         holdCall(localStorage.getItem('callId'));
-    }else if(holdstate == 'held'){
+    }else if(softphonestate == 'held'){
         retrieveCall(localStorage.getItem('callId'));
     }
 });
