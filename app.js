@@ -15,8 +15,8 @@ var shuttingdown = false;
 //as there is only one channel and subscription, that will receive all events from BW related to 
 //all opened calls
 var bwconnection = {
-	applicationId: 'sfdccti_pbxltest_local',
-	channelSetId: 'sfdccti_pbxltest_local_channelset',
+	applicationId: 'sfdccti_pbxltest',
+	channelSetId: 'sfdccti_pbxltest_channelset',
 	channelId: '',
 	heartbeatIntervalId: '',
 	channelUpdateIntervalId: '',

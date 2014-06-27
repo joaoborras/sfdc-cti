@@ -107,6 +107,7 @@ processchunk = function(chunk){
 					localStorage.setItem("softphonestate", 'outgoingcall');
 					//localStorage.setItem('holdstate', 'free');
 					$('#number').html('Call To: ' + callingid);
+					pulseCallButton();
 					break;
 				case 'transferring_free':
 					var callid2 = $(chunk).find('callid').text();

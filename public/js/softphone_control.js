@@ -318,6 +318,7 @@ $('#call').click(function(){
             localStorage.setItem('softphonestate', 'busy');
             break;
         case 'busy':
+        case 'outgoingcall':
             disconnectcall(localStorage.getItem('callId'));
             break;
         case 'incomingcall':
@@ -432,7 +433,8 @@ var searchAndGetScreenPopUrl_callback = function(response){
 pulseCallButton = function(){
     $('.pulse').effect('pulsate');
     setTimeout(function(){
-        if(localStorage.getItem('softphonestate') == "incomingcall"){
+        var softphonestate = localStorage.getItem('softphonestate');
+        if(softphonestate == "incomingcall" || softphonestate == 'outgoingcall'){
             $('.pulse').effect('pulsate');
             pulseCallButton();
         }
