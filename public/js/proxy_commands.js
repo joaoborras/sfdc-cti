@@ -197,7 +197,7 @@ getUserCallHistory = function(){
 	var template = Handlebars.compile(source);
 	var html;
 	var username = 'BWS_Test.zentestuser1@pbxl.net';
-	$.ajax({url: "https://localhost:3000/get_callhistoryforuser/?username=" + username + "&calllogtype=EnhancedCallLogs", 
+	$.ajax({url: "/get_callhistoryforuser/?username=" + username + "&calllogtype=EnhancedCallLogs", 
 		success:function(result){
 			var callhistory = {logentry: []};
 			var parser = new DOMParser();
