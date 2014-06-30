@@ -1,4 +1,6 @@
 $('document').ready(function(){
+    $(document).tooltip();
+    
     if(localStorage.getItem("loggedin") != "true" || !localStorage.getItem("loggedin")){
         $( "#credentials-modal-form" ).dialog( "open" );
     }else {

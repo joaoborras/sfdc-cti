@@ -193,6 +193,9 @@ fieldset {
 .ui-dialog-buttonpane{
     font-size: 10px;
 }
+.ui-tooltip{
+  font-size: 10px;
+}
 /*style for the call history form*/
 #entry-accordion{
   font-size: 10px;
