@@ -63,9 +63,9 @@ app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 
-//app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 var oneDay = 86400000;
-app.use(express.static(__dirname + '/public', { maxAge: oneDay }));
+//app.use(express.static(__dirname + '/public', { maxAge: oneDay }));
 
 app.use(app.router);
 

@@ -170,6 +170,10 @@ a#credentials, a#signout, a#bwcredentials, a#signin, a#notes, a#callhistory{
    color: black;
    font-size: 10px;
 }
+#callduration, #callhistory{
+  font-size: 8px;
+  display: inline;
+}
 #username, #password,#label_username, #label_password{
 	font-size: 10px;
 }

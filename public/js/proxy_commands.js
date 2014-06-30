@@ -217,9 +217,12 @@ getUserCallHistory = function(){
 						if(nodename == 'dialedNumber'){
 							callednumber = xmldoc.getElementsByTagName('placed').item(0).childNodes[x].nextSibling.childNodes[4].childNodes[0].nodeValue;
 							placedcallstarttime = new Date(+xmldoc.getElementsByTagName('placed').item(0).childNodes[x].nextSibling.childNodes[17].childNodes[0].nodeValue);
-							answertime = xmldoc.getElementsByTagName('placed').item(0).childNodes[x].nextSibling.childNodes[18].childNodes[0].nodeValue;
-							releasetime = xmldoc.getElementsByTagName('placed').item(0).childNodes[x].nextSibling.childNodes[19].childNodes[0].nodeValue;
-							placedcallcallduration = '';
+							answertime = new Date(+xmldoc.getElementsByTagName('placed').item(0).childNodes[x].nextSibling.childNodes[18].childNodes[0].nodeValue);
+							releasetime = new Date(+xmldoc.getElementsByTagName('placed').item(0).childNodes[x].nextSibling.childNodes[19].childNodes[0].nodeValue);
+							var callduration = releasetime - answertime;
+							placedcallcallduration = moment.duration(callduration).hours()+":"+
+							moment.duration(callduration).minutes()+":"+
+							moment.duration(callduration).seconds();
 						}
 					}catch(error){}
 				}else{
@@ -233,9 +236,12 @@ getUserCallHistory = function(){
 						if(nodename == 'callingPresentationNumber'){
 							var callingnumber = xmldoc.getElementsByTagName('received').item(0).childNodes[x].nextSibling.childNodes[4].childNodes[0].nodeValue;
 							receivedcallstarttime = new Date(+xmldoc.getElementsByTagName('received').item(0).childNodes[x].nextSibling.childNodes[14].childNodes[0].nodeValue);
-							answertime = xmldoc.getElementsByTagName('received').item(0).childNodes[x].nextSibling.childNodes[15].childNodes[0].nodeValue;
-							releasetime = xmldoc.getElementsByTagName('received').item(0).childNodes[x].nextSibling.childNodes[16].childNodes[0].nodeValue;
-							receivedcallcallduration = '';
+							answertime = new Date(+xmldoc.getElementsByTagName('received').item(0).childNodes[x].nextSibling.childNodes[15].childNodes[0].nodeValue);
+							releasetime = new Date(+xmldoc.getElementsByTagName('received').item(0).childNodes[x].nextSibling.childNodes[16].childNodes[0].nodeValue);
+							var callduration = releasetime - answertime;
+							receivedcallcallduration = moment.duration(callduration).hours()+":"+
+							moment.duration(callduration).minutes()+":"+
+							moment.duration(callduration).seconds();
 						}
 					}catch(error){}
 				}

@@ -3,6 +3,7 @@
 <head>
 
 	<meta charset="utf-8">
+	<script src="js/moment.js"></script>
 	<script src="js/handlebars-v1.3.0.js"></script>
 	<link rel="stylesheet" href="css/jquery-ui-1.10.4.css" />
 	<!--link rel="stylesheet" href="css/jquery-ui-1.10.4.custom.min.css" /-->
@@ -177,18 +178,23 @@
 			<div>
 				{{#each logentry}}
 					<p class='callhistory'>{{this.calledNumber}}</p>
+					<p class='callduration'>{{this.placedCallstartTime}}, {{this.placedCallcallDuration}}</p>
+					<hr>
 				{{/each}}
 			</div>
 			<h3>Received Calls</h3>
 			<div>
 				{{#each logentry}}
 					<p class='callhistory'>{{this.callingNumber}}</p>
+					<p class='callduration'>{{this.placedCallstartTime}}, {{this.receivedCallcallDuration}}</p>
+					<hr>
 				{{/each}}
 			</div>
 			<h3>Missed Calls</h3>
 			<div>
 				{{#each logentry}}
 					<p class='callhistory'>{{this.missedNumber}}</p>
+					<hr>
 				{{/each}}
 			</div>
 		</div>
