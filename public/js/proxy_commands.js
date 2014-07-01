@@ -196,7 +196,7 @@ getUserCallHistory = function(){
 	var source = $('#callhistory-entry-template').html();
 	var template = Handlebars.compile(source);
 	var html;
-	var username = 'BWS_Test.zentestuser1@pbxl.net';
+	var username = localStorage.getItem('username');
 	$.ajax({url: "/get_callhistoryforuser/?username=" + username + "&calllogtype=EnhancedCallLogs", 
 		success:function(result){
 			var callhistory = {logentry: []};
@@ -210,7 +210,7 @@ getUserCallHistory = function(){
 			var placedcallstarttime, answertime, releasetime, placedcallcallduration,
 				receivedcallstarttime, receivedcallcallduration, missedcallstarttime;
 
-			for(var x=0; x<=maxvalue-1;x++){
+			for(var x=0;x<=maxvalue-1;x++){
 				if(x<=placed){
 					try{
 						nodename = xmldoc.getElementsByTagName('placed').item(0).childNodes[x].nextSibling.childNodes[4].nodeName;
@@ -224,7 +224,9 @@ getUserCallHistory = function(){
 							moment.duration(callduration).minutes()+":"+
 							moment.duration(callduration).seconds();
 						}
-					}catch(error){}
+					}catch(error){
+						console.log('error when x = ' + x);
+					}
 				}else{
 					callednumber = '';
 					placedcallstarttime = '';
