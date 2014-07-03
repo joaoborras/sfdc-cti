@@ -146,6 +146,7 @@ processchunk = function(chunk){
 				case 'busy':
 				case 'transferring':
 				case 'outgoingcall':
+				case 'held':
 					if(callid == localStorage.getItem('callId')){
 						var callendtime = new Date().getTime();
 						localStorage.setItem('callEndTime', callendtime);
@@ -205,6 +206,7 @@ processchunk = function(chunk){
 			}
 			break;
 		case 'CallRetrievedEvent':
+			console.log('CallRetrievedEvent');
 			switch(localStorage.getItem('softphonestate')){
 				case 'transferring':
 				case 'transferring_free':

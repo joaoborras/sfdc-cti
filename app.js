@@ -11,25 +11,25 @@ var credentials = [{
 }];
 
 //this array stores all the BW groups from all clients. A subscription must be opened for each one
-var BW_groups = ['RSN',];
+var BW_groups = ['PBXL_Test',];
 var shuttingdown = false;
 
 //this object stores data related to BW for each ZD's app. These data are unique to the application
 //as there is only one channel and subscription, that will receive all events from BW related to 
 //all opened calls
 var bwconnection = {
-	applicationId: 'rsn_local',
-	channelSetId: 'rsn_local_channelset',
+	applicationId: 'pbxltest_local',
+	channelSetId: 'pbxltest_local_channelset',
 	channelId: '',
 	heartbeatIntervalId: '',
 	channelUpdateIntervalId: '',
 	subscriptionId: '',
 	subscriptionUpdateIntervalId: '',
 	callhalf: '',
-	groupadmin: 'rsn.admin@pbxl.net',
-	groupadminpassword: '44a!Vh92Kn',
+	groupadmin: 'jp_zentest@pbxl.net',
+	groupadminpassword: 'Borras123',
 	serviceprovider: 'PBXL%20Inc.',
-	groupId: 'RSN',
+	groupId: 'PBXL_Test',
 };
 
 //**************** global constants to be used by all ZD's apps *********************
@@ -55,7 +55,7 @@ var log = new Log('debug', fs.createWriteStream('log.txt', {'flags':'a'}));
 
 //******************* setup the proxy ***********************
 // all environments
-app.set('port', process.env.PORT || 4000);
+app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
 app.engine('html', require('ejs').renderFile);
 app.use(express.favicon());
