@@ -317,12 +317,15 @@ $('#call').click(function(){
             }
             break;
         case 'transferring':
+            if(!localStorage.getItem('callId')){
+                disconnectcall(localStorage.getItem('callId2'));
+            }
             localStorage.setItem('softphonestate', 'busy');
             break;
         case 'busy':
         case 'outgoingcall':
             disconnectcall(localStorage.getItem('callId'));
-            break;
+            break;   
         case 'incomingcall':
             acceptcall();
             break;
@@ -337,6 +340,10 @@ $('#transfer').click(function(){
     var softphonestate = localStorage.getItem('softphonestate');
     switch(softphonestate){
         case 'transferring':
+            retrieveCall(localStorage.getItem('callId'));
+            break;
+        case 'transferring_calling':
+            localStorage.setItem('softphonestate', 'transferring');
             retrieveCall(localStorage.getItem('callId'));
             break;
         case 'transferring_consulting':

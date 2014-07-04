@@ -146,28 +146,45 @@ processchunk = function(chunk){
 				case 'busy':
 				case 'transferring':
 				case 'outgoingcall':
+				case 'incomingcall':
 				case 'held':
-					if(callid == localStorage.getItem('callId')){
+				case 'transferring_calling':
+				case 'transferring_free':
+					if(callid == localStorage.getItem('callId') || callid == localStorage.getItem('callId2')){
 						var callendtime = new Date().getTime();
 						localStorage.setItem('callEndTime', callendtime);
 						localStorage.setItem("softphonestate", 'free');
 						//localStorage.removeItem('holdstate');
-						localStorage.setItem('destinationnumber', '')
+						localStorage.setItem('destinationnumber', '');
 						$('#destination').val('');
 						$('#number').html("");
 						//change background color of "call" icon to #0c3(green)
 						$('#call').css('background-color', '#093');
+						//bring the Transfer button back to its original state
+						$('#transferring').attr('id', 'transfer');
+						//finally, remove the callid that was released
+						if(callid == localStorage.getItem('callId')){
+							localStorage.removeItem('callId');
+						}else if(callid == localStorage.getItem('callId2')){
+							localStorage.removeItem('callId2');
+						}
 						//will call the function below when the user press "Save" in take notes area
 						//sforce.interaction.getPageInfo(saveCallLog); //save call log in SFDC
 					}
 					break;
 				case 'transferring_consulting':
 					localStorage.setItem("softphonestate", 'transferring');
+					if(callid == localStorage.getItem('callId')){
+						localStorage.removeItem('callId');
+					}else if(callid == localStorage.getItem('callId2')){
+						localStorage.removeItem('callId2');
+					}
 					break;
 				default:
 			}
 			break;
 		case 'CallRedirectedEvent':
+			console.log("<- CallRedirectedEvent");
 			switch(localStorage.getItem('softphonestate')){
 				case 'transferring_consulting':
 					localStorage.setItem('softphonestate', 'calltransferred');
@@ -187,6 +204,15 @@ processchunk = function(chunk){
 						$( "#calltransfer-modal-form" ).dialog( "close" );
 						localStorage.removeItem('calltransfermodal');
 					}
+					break;
+				case 'incomingcall': //this happens when Forward always is set
+					localStorage.setItem("softphonestate", 'free');
+					localStorage.setItem('destinationnumber', '');
+					$('#number').html("Call Transferred");
+					//change background color of "call" icon to #0c3(green)
+					$('#call').css('background-color', '#093');
+					//remove the callid that was released
+					localStorage.removeItem('callId');
 					break;
 				default:
 			}
