@@ -167,7 +167,7 @@ $( "#wrapup-modal-form" ).dialog({
     buttons: [
         {
             text: "Save",
-            click: function(){   
+            click: function(event){   
                 event.preventDefault();
                 var duedate = $('#duedatepicker').val();
                 console.log("Duedate is: " + duedate);
@@ -242,13 +242,13 @@ $( "#settings-modal-menu" ).dialog({
 });
 //until here setting modal dialog
 
-$('#show_hidesettings').click(function(){
+$('#show_hidesettings').click(function(event){
     event.preventDefault();
     $("#settings-modal-menu").dialog('open');
 });
 
 //Take notes text area
-$('#savenotes').click(function(){
+$('#savenotes').click(function(event){
     event.preventDefault();
     //show the notes in the wrap up "comments" area as well);
     $('#comments').text($('#takenotes').val());
@@ -257,7 +257,7 @@ $('#savenotes').click(function(){
     $('#takenotesform').css('display', 'none');
 });
 
-$('#cancelnotes').click(function(){
+$('#cancelnotes').click(function(event){
     event.preventDefault();
     $('#takenotes').val('');
     $('#takenotesform').css('display', 'none');
@@ -300,7 +300,7 @@ $('#destination').keyup(function(e){
     }
 });
 
-$('#call').click(function(){
+$('#call').click(function(event){
     event.preventDefault();
     var state = localStorage.getItem("softphonestate");
     switch(state){
@@ -333,7 +333,7 @@ $('#call').click(function(){
     } 
 });
 
-$('#transfer').click(function(){
+$('#transfer').click(function(event){
     event.preventDefault();
     //getUserDir(); -> this should be called when the HeldEvent is received and the state is
     //transferring
@@ -361,12 +361,12 @@ $('#transfer').click(function(){
     }
 });
 
-$('#address').click(function(){
+$('#address').click(function(event){
     event.preventDefault();
     getUserDir();
 });
 
-$('#hold').click(function(){
+$('#hold').click(function(event){
     event.preventDefault();
     var softphonestate = localStorage.getItem('softphonestate');
     if(softphonestate == 'busy'){
@@ -376,7 +376,7 @@ $('#hold').click(function(){
     }
 });
 
-$('#declinecall').click(function(){
+$('#declinecall').click(function(event){
     event.preventDefault();
     var username = $('#username').val();
     $.ajax({url: "/decline_call/?username=" + username + "&callid=" + callid, 
