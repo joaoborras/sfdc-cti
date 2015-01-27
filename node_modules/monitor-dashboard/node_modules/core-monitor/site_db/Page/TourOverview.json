@@ -1,0 +1,147 @@
+{
+  "id": "/TourOverview",
+  "title": "Tour Overview",
+  "description": "Node monitor tour - Tours",
+  "components": [
+    {
+      "id": "c1",
+      "viewClass": "core.Html",
+      "viewOptions": {
+        "htmlValue": "<style type=\"text/css\">\n#text p { \n  font-weight:300;\n  margin: 0 0 8px 10px;\n  font-size: 16px;\n  line-height: 1.3em\n}\n#text p a { \n  text-decoration: underline;\n}\n#text h3 {\n  font-size:32px;\n  font-weight:300;\n  margin: 22px 0 10px 0\n}\n#text h3:first-child {\n  margin-top:10px;\n}\n.nm-cv-viewport img {\n  border-radius:3px;\n}\n</style>\n<div style=\"background: #010101; border-radius:6px; height:100%; box-sizing:border-box; padding:15px; font-size:52px; font-weight:300; text-align:center;line-height:1.15em\">Site Tours</div>",
+        "background": true,
+        "title": ""
+      },
+      "css": {
+        ".nm-cv": "top:10px; z-index:5; left:0px;",
+        ".nm-cv-viewport": "height:90px; width:860px;"
+      },
+      "monitor": {}
+    },
+    {
+      "id": "c2",
+      "viewClass": "core.Html",
+      "viewOptions": {
+        "htmlValue": "<img style=\"margin-top:-160px;\" src=\"/app/core/css/images/sidebar.jpg\" title=\"Image: /app/core/css/images/sidebar.jpg\">",
+        "background": true,
+        "title": ""
+      },
+      "css": {
+        ".nm-cv": "top:250px; z-index:15; left:10px;",
+        ".nm-cv-viewport": "height:90px; width:180px;"
+      },
+      "monitor": {}
+    },
+    {
+      "id": "c3",
+      "viewClass": "core.Html",
+      "viewOptions": {
+        "htmlValue": "<div id=\"text\">\n  <h3>Finding Tours</h3>\n  <p>Tours are located at the bottom of the left sidebar, and are organized by the monitor application containing the tour.</p>\n\n</div>",
+        "background": false,
+        "title": ""
+      },
+      "css": {
+        ".nm-cv": "top:247px; z-index:10; left:268px;",
+        ".nm-cv-viewport": "height:100px; width:610px; z-index:10;"
+      },
+      "monitor": {}
+    },
+    {
+      "id": "c5",
+      "viewClass": "core.Html",
+      "viewOptions": {
+        "htmlValue": "<div id=\"text\">\n\n  <h3>Running Tours</h3>\n<p>When a tour is selected from the sidebar, the first page of the tour is loaded and a tour control is displayed at the bottom of the screen. The tour runs until it is paused or stopped from the control.\n  </p>\n  <p>\nMost tours cycle through&nbsp;pages at a specified interval.\n  </p>\n</div>",
+        "background": false,
+        "title": ""
+      },
+      "css": {
+        ".nm-cv": "top:390px; z-index:16; left:0px;",
+        ".nm-cv-viewport": "height:130px; width:880px;"
+      },
+      "monitor": {}
+    },
+    {
+      "id": "c7",
+      "viewClass": "core.Html",
+      "viewOptions": {
+        "htmlValue": "<img style=\"border-radius:6px\" src=\"/app/core/css/images/tour.jpg\" title=\"Tour control\">",
+        "background": true,
+        "title": ""
+      },
+      "css": {
+        ".nm-cv": "top:137px; z-index:18; left:644px;",
+        ".nm-cv-viewport": "height:73px; width:215px;"
+      },
+      "monitor": {}
+    },
+    {
+      "id": "c8",
+      "viewClass": "core.Html",
+      "viewOptions": {
+        "htmlValue": "<div id=\"text\">\n  <p> \n    Tours guide you through a series of pages on your site.</p>\n</div>",
+        "background": false,
+        "title": ""
+      },
+      "css": {
+        ".nm-cv": "top:160px; z-index:17; left:0px;",
+        ".nm-cv-viewport": "height:40px; width:610px; z-index:19;"
+      },
+      "monitor": {}
+    },
+    {
+      "id": "c9",
+      "viewClass": "core.Html",
+      "viewOptions": {
+        "htmlValue": "<img style=\"\" src=\"/app/core/css/images/tour_manage.jpg\" title=\"Add a tour\">",
+        "background": true,
+        "title": ""
+      },
+      "css": {
+        ".nm-cv": "top:578px; z-index:19; left:0px;",
+        ".nm-cv-viewport": "height:70px; width:240px;"
+      },
+      "monitor": {}
+    },
+    {
+      "id": "c10",
+      "viewClass": "core.Html",
+      "viewOptions": {
+        "htmlValue": "<div id=\"text\">\n  <h3>Managing Tours</h3>\n  <p>Tours can be added and edited by selecting the tour settings icon, which appears when hovering over the tour heading bar.</p>\n\n</div>",
+        "background": false,
+        "title": ""
+      },
+      "css": {
+        ".nm-cv": "top:570px; z-index:20; left:284px;",
+        ".nm-cv-viewport": "height:90px; width:600px; z-index:10;"
+      },
+      "monitor": {}
+    },
+    {
+      "id": "c11",
+      "viewClass": "core.Html",
+      "viewOptions": {
+        "htmlValue": "<img style=\"\" src=\"/app/core/css/images/tour_settings.jpg\" title=\"Add a tour\">",
+        "background": true,
+        "title": ""
+      },
+      "css": {
+        ".nm-cv": "top:710px; z-index:21; left:326px;",
+        ".nm-cv-viewport": "height:450px; width:540px;"
+      },
+      "monitor": {}
+    },
+    {
+      "id": "c12",
+      "viewClass": "core.Html",
+      "viewOptions": {
+        "htmlValue": "<div id=\"text\">\n  <h3>Settings</h3>\n  <p>Pages can be re-arranged, added, and removed in the tour settings page.</p><p>To add a new tour, press the <i class=\"icon-plus\"></i> symbol above the list of tours.</p>\n\n</div>",
+        "background": false,
+        "title": ""
+      },
+      "css": {
+        ".nm-cv": "top:714px; z-index:22; left:4px;",
+        ".nm-cv-viewport": "height:450px; width:290px; z-index:10;"
+      },
+      "monitor": {}
+    }
+  ]
+}

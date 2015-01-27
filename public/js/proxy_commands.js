@@ -257,7 +257,7 @@ getUserCallHistory = function(){
 						nodename = xmldoc.getElementsByTagName('missed').item(0).childNodes[x].nextSibling.childNodes[4].nodeName;
 						if(nodename == 'callingPresentationNumber'){
 							var missednumber = xmldoc.getElementsByTagName('missed').item(0).childNodes[x].nextSibling.childNodes[4].childNodes[0].nodeValue;
-							missedcallstarttime = new Date(+xmldoc.getElementsByTagName('missed').item(0).childNodes[x].nextSibling.childNodes[12].childNodes[0].nodeValue);
+							missedcallstarttime = new Date(+xmldoc.getElementsByTagName('missed').item(0).childNodes[x].nextSibling.childNodes[14].childNodes[0].nodeValue);
 						}
 					}catch(error){}
 				}

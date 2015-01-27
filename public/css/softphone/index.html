@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="css/jquery-ui.css" />
+	<script src="js/jquery.js"></script>
+	<script src="js/jquery-ui.js"></script>
+	<script src="js/jquery.base64.js"></script>
+	<script src="js/handlebars-v1.3.0.js"></script>
+	<link rel="stylesheet" href="css/main.css" type="text/css" />
+	<script src="https://c.na1.visual.force.com/support/api/30.0/interaction.js" type="text/javascript"></script>
+</head>
+<body>
+	<!-- jQuery dial-pad -->
+	<table>
+		<tr>
+	        <td id="title" colspan=3>
+            <img id="logo" src="images/logo.png" alt="PBXL" width="50px">
+            <img id="show_hidesettings" src="images/settings.png" width="9px" alt="settings"></td>
+	    </tr>
+	    <tr>
+	        <td id='visor' colspan=3>
+	            <sup>User:<span id='loggeduser'></span></sup>
+	                <p id='number'></p>
+	        </td>
+	    </tr> 
+	</table>
+	<div id="dialpad">
+	    <table>   
+	        <tr>
+	            <td class='digit'>1</td>
+	            <td class='digit'>2</td>
+	            <td class='digit'>3</td>
+	        </tr>
+	        <tr>
+	            <td class='digit'>4</td>
+	            <td class='digit'>5</td>
+	            <td class='digit'>6</td>
+	        </tr>
+	        <tr>
+	            <td class='digit'>7</td>
+	            <td class='digit'>8</td>
+	            <td class='digit'>9</td>
+	        </tr>
+	        <tr>
+	            <td class='digit'>*</td>
+	            <td class='digit'>0</td>
+	            <td class='digit'>#</td>
+	        </tr>
+	    </table>
+	</div>
+	<div id="buttons">
+	<table>
+	    <tr>
+	        <td id='clear'><img src="images/clear.png" width="15" alt="clear"></td>
+	        <td id='delete'><img src="images/delete.png" width="17" alt="delete"></td>
+	        <td id='call' class='pulse'><img src="images/call.png" width="18" alt="call"></td>
+	    </tr>
+	    <tr>
+	        <td id='hold'><img src="images/hold.png" width="22" alt="hold"></td>
+	        <td id='transfer'><img src="images/transfer.png" width="30" alt="transfer"></td>
+	        <td id="show_hidedialpad"><img src="images/dialpad.png" width="18" alt="show dialpad"></td>
+	    </tr>
+	</table>
+    </div>
+	<!-- end of jQuery dial-pad -->
+	
+	<!-- taking notes text area -->
+	<div id='takenotesform'>
+		<textarea id='takenotes' rows='10' cols='20'>Notes</textarea><br/>
+		<button id='savenotes' type='button'>Save</button>
+		<button id='cancelnotes' type='button'>Cancel</button>
+	</div>
+	<!-- until here taking notes text area -->
+
+	<!-- Call Wrap Up form -->
+	<div>
+	    <form id='wrapup-modal-form'>
+	        <hr><br/>
+	        <label>Subject:</label><br/>
+	        <input id='subject' type='text' value='' placeholder='log subject' size='20'></input><br/>
+	        <label>Call Result:</label><br/>
+	        <select id='callresult'><br/>
+	            <option value='Success'>Success</option>
+	            <option value='Callback'>Callback</option>
+	            <option value='Lead'>Lead</option>
+	            <option value='Fail'>Fail</option>
+	        </select><br/>
+	        <label>Priority:</label><br/>
+	        <select id='priorities'><br/>
+	            <option value='High'>High</option>
+	            <option value='Normal'>Normal</option>
+	            <option value='Low'>Low</option>
+	        </select><br/>
+	        <label>Status:</label><br/>
+	        <select id='status'>
+	            <option value='Completed'>Completed</option>
+	            <option value='In Progress'>In Progress</option>
+	            <option value='Not Started'>Not Started</option>
+	            <option value='Waiting on someone else'>Waiting someone else</option>
+	            <option value='Deferred'>Deferred</option>
+	        </select><br/>
+	        <label>Due Date:</label><br/>
+	        <input type='text' id='duedatepicker'><br/>
+	        <textarea id='comments' rows='4' cols='15'>Comments</textarea><br/>
+	    </form>
+	</div>
+	<!-- up to here -->
+	
+	<!-- the BW credentials modal -->
+	<div id="bw_credentials">
+		<a id="signout">Sign Out</a>
+		<form id="credentials-modal-form">
+			<fieldset>
+				<label id="label_username">User Name:</label><br>
+				<input class="text ui-widget-content ui-corner-all" class="modal-field" id="username" type="text" name="username" size="30" value="BWS_Test.zentestuser1@pbxl.net"><br>
+				<label id="label_password">Password:</label><br>
+				<input class="text ui-widget-content ui-corner-all" class="modal-field" id="password" type="password" name="password" value="Borras123"><br>
+			</fieldset>
+		</form>
+	</div>
+	<!-- until here the BW credentials modal -->
+
+	<!-- the Call Transfer modal form -->
+	<div>
+		<form id='calltransfer-modal-form'>
+			<fieldset>
+				<div id='userdir'></div>
+			</fieldset>
+		</form>
+	</div>
+	<!-- until here the Call Transfer modal form -->
+
+	<div id="dialog_mainhttp_disconnection" title="Disconnected from the server!">
+  		<p>
+  			<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>Lost connection with the server. Please Log In again.
+  		</p>
+	</div>
+
+	<!--this is the handlebars template that will receive directory info -->
+	<script id="directory-entry-template" type="text/x-handlebars-template">
+		<div class="entry">
+			<input id='extensioninput' list="extensions" name="extension" autocomplete="off" placeholder='choose extension'>
+				<datalist id='extensions' class='userdirectory'>
+				{{#each users}}
+					<option class='dirextension' value= "{{this.extension}}">{this.lastname}} {{this.firstname}}</option>
+				{{/each}}
+				</datalist>
+		</div>
+	</script>
+	<!--until here handlebars template -->
+
+	<!-- script src="js/main.js"></script -->
+	<script src="js/softphone_control.js"></script>
+	<script src="js/proxy_events.js"></script>
+	<script src="js/proxy_commands.js"></script>
+	<script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+/* header */
+
+body { background:#CCC;}
+
+td{
+  padding:10px;
+  font-weight:bold;
+  max-width: 20px;
+  text-align: center;
+}
+
+table{
+  width:100%;
+	border-collapse: collapse;
+}
+
+#title {
+    padding:5px 0 0 0;
+	background:#fff;
+    border-radius: 5px 5px 0 0;
+	-ms-border-radius: 5px 5px 0 0;
+ 	-moz-border-radius: 5px 5px 0 0;
+ 	-webkit-border-radius: 5px 5px 0 0;
+}
+#logo{
+	display:inline;
+	margin-left:20px;
+}
+
+#show_hidesettings {
+	float:right;
+	padding:6px 7px;
+    background:#4e5660;
+    border-radius: 3px;
+	-ms-border-radius: 3px;
+ 	-moz-border-radius: 3px;
+ 	-webkit-border-radius: 3px;
+	margin:1px 7px 0 0;
+	display:block;
+}
+
+#visor{
+	background:#ced4db;
+    border-radius: 0;
+	-ms-border-radius: 0;
+ 	-moz-border-radius: 0;
+ 	-webkit-border-radius: 0;
+    text-align: left;
+	height:20px;
+	border-top:3px solid #bcc3cd;
+	color:#393939;
+}
+
+
+#visor p{
+	line-height:100%;
+	margin:0 5px;
+	font-size:12px;
+}
+
+#number{
+    font-size:15px;
+    height:20px;
+}
+#visor sup{
+    font-size:10px;
+margin-left:3px;
+line-height:100%;
+}
+
+/*take notes text area*/
+#takenotesform{
+  display:none;
+  background:#fff;
+}
+
+#signout{
+  display:none;
+}
+
+/* dialpad */
+#dialpad{
+  display:none;
+	background:#fff;
+}
+
+#dialpad table{
+	background: none repeat scroll 0 0 #FFF;
+  border-spacing: 10px;
+	border-collapse:separate;
+   width: 100%;
+}
+#dialpad td{
+	background-color: #56bcdc;
+   border-radius: 100%;
+	-ms-border-radius: 100%;
+ 	-moz-border-radius: 100%;
+ 	-webkit-border-radius: 100%;
+    font-weight: bold;
+    max-width: 20px;
+    padding: 10px;
+	color:#fff;
+}
+
+sup, #show_hidedialpad, .userdirectory{
+    font-size:10px;
+}
+
+/* buttons */
+#buttons table{
+    border-spacing: 2px;
+	border-collapse:separate;
+	background:#fff;
+    border-radius: 0 0 5px 5px;
+	-ms-border-radius: 0 0 5px 5px;
+ 	-moz-border-radius: 0 0 5px 5px;
+ 	-webkit-border-radius: 0 0 5px 5px;
+}
+#buttons td{
+    color:#FFF;
+    height:25px;
+    border-radius: 5px;
+	-ms-border-radius: 5px;
+ 	-moz-border-radius: 5px;
+ 	-webkit-border-radius: 5px;
+}
+
+#buttons td img{
+	vertical-align:middle;
+}
+
+.digit, #delete, #call, #hold, #transfer, #show_hidedialpad{
+    cursor:pointer;
+}
+#call {
+    background:#f08229;
+}
+#clear, #delete, #hold, #transfer, #show_hidedialpad{
+    background:#4e5660;
+}
+#extras{
+    float:right;
+}
+#retrieve{
+    font-size:10px;
+    height:10px;
+    background:red;
+}
+/*related to the softphone modal form */
+a#credentials, a#signout{
+   text-decoration:underline;
+   cursor:pointer;
+   color: black;
+   font-size: 10px;
+}
+#username, #password,#label_username, #label_password{
+	font-size: 10px;
+}
+/*Datepicker for the wrap up form*/
+.ui-datepicker{
+    font-size:10px;
+}
+/*modal forms: sign in and call transfer*/
+.ui-dialog-content, .ui-dialog-titlebar{
+    font-size: 10px;
+}
+fieldset {
+    padding:0; 
+    border:0; 
+    margin-top:25px; 
+}
+.ui-dialog-buttonpane{
+    font-size: 10px;
+}

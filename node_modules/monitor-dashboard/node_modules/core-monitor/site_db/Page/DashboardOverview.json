@@ -1,0 +1,256 @@
+{
+  "id": "/app/core/DashboardOverview",
+  "title": "Dashboard Overview",
+  "description": "Node monitor tour - Dashboards",
+  "components": [
+    {
+      "id": "c1",
+      "viewClass": "core.Html",
+      "viewOptions": {
+        "htmlValue": "<style type=\"text/css\">\n#text p { \n  font-weight:300;\n  margin: 0 0 8px 10px;\n  font-size: 16px;\n  line-height: 1.3em\n}\n#text p a { \n  text-decoration: underline;\n}\n#text h3 {\n  font-size:32px;\n  font-weight:300;\n  margin: 22px 0 10px 0\n}\n#text h3:first-child {\n  margin-top:10px;\n}\n.nm-cv-viewport img {\n  border-radius:3px;\n}\n</style>\n<div style=\"background: #010101; border-radius:6px; height:100%; box-sizing:border-box; padding:15px; font-size:52px; font-weight:300; text-align:center;line-height:1.15em\">Dashboards</div>",
+        "background": true,
+        "title": ""
+      },
+      "css": {
+        ".nm-cv": "top:10px; z-index:5; left:0px;",
+        ".nm-cv-viewport": "height:90px; width:860px;"
+      },
+      "monitor": {}
+    },
+    {
+      "id": "c2",
+      "viewClass": "core.Html",
+      "viewOptions": {
+        "htmlValue": "<img style=\"height:100%; width=100%;\" src=\"/app/core/css/images/add-a-component.jpg\" title=\"Add a component\">",
+        "background": true,
+        "title": ""
+      },
+      "css": {
+        ".nm-cv": "top:570px; z-index:24; left:700px;",
+        ".nm-cv-viewport": "height:190px; width:160px;"
+      },
+      "monitor": {}
+    },
+    {
+      "id": "c3",
+      "viewClass": "core.Html",
+      "viewOptions": {
+        "htmlValue": "<div id=\"text\">\n  <h3>Header</h3>\n  <p> \n    The header contains the page title and main&nbsp;menu. Most page elements show more information when you hover over them.&nbsp;</p><p><span style=\"line-height: 1.3em;\">For example, clicking the Node Monitor logo to the right hides and shows the header bar.</span><br></p><p> \n</p></div>",
+        "background": false,
+        "title": ""
+      },
+      "css": {
+        ".nm-cv": "top:210px; z-index:10; left:0px;",
+        ".nm-cv-viewport": "height:110px; width:880px; z-index:10;"
+      },
+      "monitor": {}
+    },
+    {
+      "id": "c4",
+      "viewClass": "core.Html",
+      "viewOptions": {
+        "htmlValue": "<div id=\"text\">\n  <h3>Sidebar</h3>\n  <p> \n    Pages in your site are shown in the sidebar for easy navigation, organized by the path to the page.\n  </p>\n  <p>\n    Page tours are also shown in the sidebar, and can be run by selecting the tour. For more on tours, head over to the <a href=\"/app/core/TourOverview\">tour overview</a> page.</p>\n</div>",
+        "background": false,
+        "title": ""
+      },
+      "css": {
+        ".nm-cv": "top:360px; z-index:7; left:190px;",
+        ".nm-cv-viewport": "height:140px; width:690px;"
+      },
+      "monitor": {}
+    },
+    {
+      "id": "c5",
+      "viewClass": "core.Html",
+      "viewOptions": {
+        "htmlValue": "<div id=\"text\">\n  <h3>Components</h3>\n  <p> \n Components are the items contained on a dashboard page. They are added by selecting \"Add a Component\" on the menu, and they can be sized and positioned anywhere on the dashboard. Move your mouse <a id=\"hoverOverThis\" href=\"javascript:#\" title=\"Show component outlines for a couple seconds\">over this</a> to see the components that make up&nbsp;this page.</p>\n</div>",
+        "background": false,
+        "title": ""
+      },
+      "css": {
+        ".nm-cv": "top:570px; z-index:23; left:0px;",
+        ".nm-cv-viewport": "height:116px; width:657px; z-index:27;"
+      },
+      "onInit": "$('#hoverOverThis').on('mouseover', function() {\npageView.editPage();\nsetTimeout(function(){\npageView.unlockPage();}\n,2000);\n});",
+      "monitor": {}
+    },
+    {
+      "id": "c6",
+      "viewClass": "core.Html",
+      "viewOptions": {
+        "htmlValue": "<img style=\"height:100%; width=100%;\" src=\"/app/core/css/images/header.jpg\" title=\"Node monitor header\">",
+        "background": true,
+        "title": ""
+      },
+      "css": {
+        ".nm-cv": "top:200px; z-index:17; left:280px;",
+        ".nm-cv-viewport": "height:24px; width:442px;"
+      },
+      "monitor": {}
+    },
+    {
+      "id": "c7",
+      "viewClass": "core.Html",
+      "viewOptions": {
+        "htmlValue": "<img style=\"height:100%; width=100%;\" src=\"/app/core/css/images/sidebar.jpg\" title=\"Node monitor sidebar\">",
+        "background": true,
+        "title": ""
+      },
+      "css": {
+        ".nm-cv": "top:350px; z-index:14; left:0px;",
+        ".nm-cv-viewport": "height:180px; width:130px;"
+      },
+      "monitor": {}
+    },
+    {
+      "id": "c8",
+      "viewClass": "core.Clock",
+      "viewOptions": {
+        "title": "Clock",
+        "highcharts": {
+          "chart": {
+            "type": "gauge",
+            "margin": 0,
+            "plotBackgroundColor": "transparent",
+            "plotBorderWidth": 0,
+            "plotShadow": false
+          },
+          "plotOptions": {
+            "gauge": {
+              "dial": {
+                "backgroundColor": "rgba(200,183,155,1)"
+              },
+              "pivot": {
+                "backgroundColor": "rgba(200,183,155,1)"
+              }
+            }
+          },
+          "yAxis": {
+            "labels": {
+              "distance": -20
+            },
+            "min": 0,
+            "max": 12,
+            "lineWidth": 0,
+            "showFirstLabel": false,
+            "minorTickInterval": "auto",
+            "minorTickWidth": 1,
+            "minorTickLength": 5,
+            "minorTickPosition": "inside",
+            "minorGridLineWidth": 0,
+            "minorTickColor": "rgba(200,183,155,1)",
+            "tickInterval": 1,
+            "tickWidth": 2,
+            "tickPosition": "inside",
+            "tickLength": 10,
+            "tickColor": "rgba(200,183,155,1)",
+            "minPadding": 0,
+            "maxPadding": 0,
+            "title": {
+              "text": ""
+            }
+          },
+          "series": [
+            {
+              "data": [
+                {
+                  "id": "hour",
+                  "y": 4,
+                  "dial": {
+                    "radius": "60%",
+                    "baseWidth": 4,
+                    "baseLength": "95%",
+                    "rearLength": 0
+                  }
+                },
+                {
+                  "id": "minute",
+                  "y": 20,
+                  "dial": {
+                    "baseLength": "95%",
+                    "rearLength": 0
+                  }
+                },
+                {
+                  "id": "second",
+                  "y": 0,
+                  "dial": {
+                    "radius": "100%",
+                    "baseWidth": 1,
+                    "rearLength": "20%"
+                  }
+                }
+              ],
+              "animation": false,
+              "dataLabels": {
+                "enabled": false
+              }
+            }
+          ]
+        },
+        "background": true
+      },
+      "css": {
+        ".nm-cv": "top:730px; z-index:27; left:20px;",
+        ".nm-cv-viewport": "height:140px; width:140px;"
+      },
+      "monitor": {}
+    },
+    {
+      "id": "c10",
+      "viewClass": "core.Html",
+      "viewOptions": {
+        "htmlValue": "<style type=\"text/css\">\n#text table img {\n  height: 64px;\n  width: 64px;\n  margin: 20px 20px 10px 30px;\n  border-radius:10px;\n  border: 2px solid #666;\n  cursor: pointer;\n  text-decoration:none;\n  -webkit-box-shadow: 2px 2px 6px #666;\n}\n#text table h5 {\n  font-weight: 300;\n  font-size: 22px;\n  margin: 20px 0 10px 10px;\n}\n</style>\n<div id=\"text\">\n  <h3>Core Components</h3>\n  <p>\n    The following components are installed by default&nbsp;from the <a href=\"http://npmjs.org/core-monitor\" title=\"core-monitor on npmjs.org\" target=\"_blank\" data-placement=\"bottom\">core-monitor</a> project. &nbsp;Click the icon for more information.</p>\n  <p></p><table><tbody>\n\n    <tr>\n      <td><a href=\"/app/core/Components/AppViewer\"><img src=\"/app/core/image/AppViewer.png\" title=\"App Viewer\"></a></td>\n      <td>\n        <h5>App Viewer</h5>\n        <p>An application process viewer</p>\n      </td>\n    </tr>\n\n    <tr>\n      <td><a href=\"/app/core/Components/BarChart\"><img src=\"/app/core/image/BarChart.png\" title=\"Bar Chart\"></a></td>\n      <td>\n        <h5>Bar Chart</h5>\n        <p>A Highcharts bar chart</p>\n      </td>\n    </tr>\n\n    <tr>\n      <td><a href=\"/app/core/Components/Button\"><img src=\"/app/core/image/Button.png\" title=\"Button\"></a></td>\n      <td>\n        <h5>Button</h5>\n        <p>A button to place on a page that runs javascript when pressed</p>\n      </td>\n    </tr>\n\n    <tr>\n      <td><a href=\"/app/core/Components/Clock\"><img src=\"/app/core/image/Clock.png\" title=\"Clock\"></a></td>\n      <td>\n        <h5>Clock</h5>\n        <p>A clock can put a finishing touch on a dashboard</p>\n      </td>\n    </tr>\n\n    <tr>\n      <td><a href=\"/app/core/Components/Gauge\"><img src=\"/app/core/image/Gauge.png\" title=\"Gauge\"></a></td>\n      <td>\n        <h5>Gauge</h5>\n        <p>A fuel gauge for expressing the current state</p>\n      </td>\n    </tr>\n\n    <tr>\n      <td><a href=\"/app/core/Components/HTMLTemplate\"><img src=\"/app/core/image/HTMLView.png\" title=\"HTML Template\"></a></td>\n      <td>\n        <h5>HTML Template</h5>\n        <p>Place any HTML on your dashboard, optionally merging backend data with text.</p>\n      </td>\n    </tr>\n\n    <tr>\n      <td><a href=\"/app/core/Components/LineChart\"><img src=\"/app/core/image/LineChart.png\" title=\"Line Chart\"></a></td>\n      <td>\n        <h5>Line Chart</h5>\n        <p>A highcharts line chart</p>\n      </td>\n    </tr>\n\n    <tr>\n      <td><a href=\"/app/core/Components/LogViewer\"><img src=\"/app/core/image/LogViewer.png\" title=\"Log Viewer\"></a></td>\n      <td>\n        <h5>Log Viewer</h5>\n        <p>A highly configurable log viewer, with a filtering and JSON expansion.</p>\n      </td>\n    </tr>\n\n    <tr>\n      <td><a href=\"/app/core/Components/ObjectInspector\"><img src=\"/app/core/image/ObjectInspector.png\" title=\"Object Inspector\"></a></td>\n      <td>\n        <h5>Object Inspector</h5>\n        <p>Monitor any globally available object.  If the object is a backbone model, monitor changes in real time.</p>\n      </td>\n    </tr>\n\n    <tr>\n      <td><a href=\"/app/core/Components/PieChart\"><img src=\"/app/core/image/PieChart.png\" title=\"Pie Chart\"></a></td>\n      <td>\n        <h5>Pie Chart</h5>\n        <p>A Highcharts pie chart</p>\n      </td>\n    </tr>\n\n    <tr>\n      <td><a href=\"/app/core/Components/ProbeViewer\"><img src=\"/app/core/image/ProbeViewer.png\" title=\"Probe Viewer\"></a></td>\n      <td>\n        <h5>Probe Viewer</h5>\n        <p>Monitor any probe running in any of your Node.js processes.</p>\n      </td>\n    </tr>\n\n    <tr>\n      <td><a href=\"/app/core/Components/REPLConsole\"><img src=\"/app/core/image/Console.png\" title=\"REPL Console\"></a></td>\n      <td>\n        <h5>REPL Console</h5>\n        <p>Yeah.  In a browser.</p>\n      </td>\n    </tr>\n\n    <tr>\n      <td><a href=\"/app/core/Components/Slider\"><img src=\"/app/core/image/Slider.png\" title=\"Slider\"></a></td>\n      <td>\n        <h5>Slider</h5>\n        <p>Show the state of a numeric variable, and allow user input.</p>\n      </td>\n    </tr>\n\n    <tr>\n      <td><a href=\"/app/core/Components/SparkLine\"><img src=\"/app/core/image/SparkLine.png\" title=\"Spark Line\"></a></td>\n      <td>\n        <h5>Spark Line</h5>\n        <p>A Highcharts line chart, without the dressing.</p>\n      </td>\n    </tr>\n\n    <tr>\n      <td><a href=\"/app/core/Components/WebSnippet\"><img src=\"/app/core/image/WebClip.png\" title=\"Web Snippet\"></a></td>\n      <td>\n        <h5>Web Snippet</h5>\n        <p>Embed a snippet of another web page in your dashboard.</p>\n      </td>\n    </tr>\n\n  </tbody></table><p></p>\n</div>",
+        "background": false,
+        "title": ""
+      },
+      "css": {
+        ".nm-cv": "top:960px; z-index:19; left:10px;",
+        ".nm-cv-viewport": "height:1632px; width:872px; z-index:28;"
+      },
+      "monitor": {}
+    },
+    {
+      "id": "c11",
+      "viewClass": "core.Html",
+      "viewOptions": {
+        "htmlValue": "<div id=\"text\">\n  <p> \n  This is a clock component to the left.\n</p>\n<p>\n  It has a title bar on the top and the clock inside. You can position the clock on the page&nbsp;by dragging in the title bar, to the right of the title.\n</p><p><br></p>\n</div>",
+        "background": false,
+        "title": ""
+      },
+      "css": {
+        ".nm-cv": "top:730px; z-index:20; left:220px;",
+        ".nm-cv-viewport": "height:90px; width:443px; z-index:27;"
+      },
+      "monitor": {}
+    },
+    {
+      "id": "c12",
+      "viewClass": "core.Html",
+      "viewOptions": {
+        "htmlValue": "<div id=\"text\">\n <p> \n After dragging the clock to a new position, you may notice an asterisk (*) to the left of the page title. That says the page is dirty and needs saving.\n</p>\n<p>\nRefreshing the page when it's dirty will restore it to the way it was before your changes.\n</p>\n</div>",
+        "background": false,
+        "title": ""
+      },
+      "css": {
+        ".nm-cv": "top:826px; z-index:29; left:220px;",
+        ".nm-cv-viewport": "height:80px; width:660px;"
+      },
+      "monitor": {}
+    },
+    {
+      "id": "c13",
+      "viewClass": "core.Html",
+      "viewOptions": {
+        "htmlValue": "<div id=\"text\">\n <p> \n Each page on this site is a dashboard with the following elements:</p>\n</div>",
+        "background": false,
+        "title": ""
+      },
+      "css": {
+        ".nm-cv": "top:140px; z-index:28; left:0px;",
+        ".nm-cv-viewport": "height:25px; width:877px;"
+      },
+      "monitor": {}
+    }
+  ]
+}
