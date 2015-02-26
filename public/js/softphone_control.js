@@ -52,6 +52,10 @@ $('document').ready(function(){
     $('#destination').val(localStorage.getItem('destinationnumber'));
 });
 
+$('document').unload(function(){
+    console.log("User is about to change page");
+});
+
 $('.digit').click(function(){
     var number = $(this).html();
     //$('#number').append(number);
